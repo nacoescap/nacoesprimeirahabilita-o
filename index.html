@@ -301,6 +301,15 @@ tbody tr:last-child td{border-bottom:none;}
 .followup-remove:hover{filter:brightness(0.96);}
 .followup-empty{font-size:12.5px;color:var(--text-muted);padding:6px 2px 10px;}
 
+.inline-select{
+  padding:6px 9px;border:1.5px solid var(--border);border-radius:999px;font-size:12px;font-weight:700;
+  cursor:pointer;background:#eef1f4;color:var(--text-muted);
+}
+.inline-select:focus{outline:none;}
+.inline-select.sit-aberto{background:#e2f0f7;color:var(--blue-700);border-color:#cfe4ee;}
+.inline-select.sit-reprovado{background:var(--danger-bg);color:var(--danger);border-color:#f3d3d3;}
+.inline-select.sit-enviado{background:#fdf1cd;color:#9a6c00;border-color:#f5e3ad;}
+
 /* Indicator legend */
 .legend-row{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-muted);margin-bottom:12px;}
 .legend-swatch{width:12px;height:12px;border-radius:3px;background:var(--weekend-bg);border:1px solid #f0c9c9;}
@@ -688,6 +697,51 @@ tbody tr:last-child td{border-bottom:none;}
   </div>
 </div>
 
+<!-- ============================================================= -->
+<!-- MODAL: FOLLOW-UP AVULSO (ver/registrar ligações sem editar tudo) -->
+<!-- ============================================================= -->
+<div class="modal-overlay hidden" id="modalFollowup">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Follow-up · <span id="followupClienteNome"></span></h3>
+      <button class="modal-close" data-close="modalFollowup">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="followupOrcId" />
+      <div id="followupOnlyList" class="followup-list"></div>
+      <button type="button" class="btn btn-secondary btn-sm" id="btnAddLigacaoStandalone">+ Registrar Ligação</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-close="modalFollowup">Cancelar</button>
+      <button class="btn btn-primary" id="btnSalvarFollowup">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- MODAL: MOTIVO RÁPIDO (ao reprovar direto pela lista)           -->
+<!-- ============================================================= -->
+<div class="modal-overlay hidden" id="modalMotivoRapido">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Motivo da Reprovação</h3>
+      <button class="modal-close" data-close="modalMotivoRapido">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="motivoRapidoOrcId" />
+      <div class="field"><label>Motivo</label><select id="motivoRapidoSelect"></select></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-close="modalMotivoRapido">Cancelar</button>
+      <button class="btn btn-danger" id="btnConfirmarReprovacao">Confirmar Reprovação</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* =====================================================================
    CONFIGURAÇÃO DO SUPABASE
@@ -1005,9 +1059,12 @@ function drawOrcamentosTable(){
       <td>${o.numero_aulas||0}</td>
       <td>${o.origem?.nome||'—'}</td>
       <td>${o.vendedor?.nome||'—'}</td>
-      <td>${situacaoBadge(o.situacao)}</td>
+      <td>${situacaoSelectHtml(o)}</td>
       <td>${fmtDate(o.data_fechamento)}</td>
       <td class="row-actions">
+        <button title="Ligações / Follow-up" data-followup="${o.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
+        </button>
         <button title="Editar" data-edit="${o.id}">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
         </button>
@@ -1020,12 +1077,54 @@ function drawOrcamentosTable(){
 
   tbody.querySelectorAll('[data-edit]').forEach(b=> b.addEventListener('click', ()=> openOrcamentoModal(b.dataset.edit)));
   tbody.querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', ()=> deleteOrcamento(b.dataset.del)));
+  tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-situacao-select]').forEach(sel=>{
+    sel.addEventListener('change', (e)=> quickChangeSituacao(sel.dataset.situacaoSelect, e.target.value));
+  });
 }
 function situacaoBadge(sit){
   if(sit==='Aberto') return '<span class="badge badge-blue">Aberto</span>';
   if(sit==='Reprovado') return '<span class="badge badge-red">Reprovado</span>';
   if(sit==='Enviado ao Cliente') return '<span class="badge badge-yellow">Enviado ao Cliente</span>';
   return `<span class="badge badge-gray">${sit||'—'}</span>`;
+}
+function situacaoSelectHtml(o){
+  const cls = o.situacao==='Reprovado' ? 'sit-reprovado' : (o.situacao==='Enviado ao Cliente' ? 'sit-enviado' : 'sit-aberto');
+  return `<select class="inline-select ${cls}" data-situacao-select="${o.id}">
+    <option value="Aberto" ${o.situacao==='Aberto'?'selected':''}>Aberto</option>
+    <option value="Enviado ao Cliente" ${o.situacao==='Enviado ao Cliente'?'selected':''}>Enviado ao Cliente</option>
+    <option value="Reprovado" ${o.situacao==='Reprovado'?'selected':''}>Reprovado</option>
+  </select>`;
+}
+
+/* Alteração rápida de situação direto na lista (sem abrir o Editar) */
+async function quickChangeSituacao(id, novaSituacao){
+  const o = state.orcamentos.find(x=>x.id===id);
+  if(!o || novaSituacao === o.situacao) return;
+
+  if(novaSituacao === 'Reprovado'){
+    openMotivoRapidoModal(id);
+    return;
+  }
+  if(novaSituacao === 'Enviado ao Cliente'){
+    if(!confirm('Enviar este orçamento ao cliente? Ele sairá da lista de Orçamentos e passará para "Enviado ao Cliente".')){
+      drawOrcamentosTable();
+      return;
+    }
+    await updateSituacaoRapida(id, { situacao:'Enviado ao Cliente', data_envio: todayISO(), situacao_cliente:'Aguardando Cliente' });
+    return;
+  }
+  if(novaSituacao === 'Aberto'){
+    await updateSituacaoRapida(id, { situacao:'Aberto', motivo_reprovado_id: null });
+    return;
+  }
+}
+async function updateSituacaoRapida(id, payload){
+  payload.updated_at = new Date().toISOString();
+  const { error } = await sb.from('orcamentos').update(payload).eq('id', id);
+  if(error){ showToast('Erro ao atualizar situação: '+error.message, true); drawOrcamentosTable(); return; }
+  showToast('Situação atualizada.');
+  renderOrcamentos();
 }
 
 ['orcSearch','orcFiltroSituacao','orcFiltroVendedor','orcFiltroOrigem'].forEach(id=>{
@@ -1127,6 +1226,76 @@ document.getElementById('btnAddLigacao').addEventListener('click', ()=>{
   renderFollowupList();
 });
 
+/* ---------- Modal avulso de Follow-up (ver/registrar sem abrir o Editar) ---------- */
+let followupOnlyList = [];
+let followupOnlyOrigem = null; // 'orcamentos' ou 'enviados', para saber qual lista atualizar depois
+
+function openFollowupModal(id){
+  let o = state.orcamentos.find(x=>x.id===id);
+  followupOnlyOrigem = 'orcamentos';
+  if(!o){ o = state.enviados.find(x=>x.id===id); followupOnlyOrigem = 'enviados'; }
+  document.getElementById('followupOrcId').value = id;
+  document.getElementById('followupClienteNome').textContent = o ? (o.cliente||'') : '';
+  followupOnlyList = parseFollowups(o ? o.followup : null);
+  renderFollowupOnlyList();
+  openModal('modalFollowup');
+}
+
+function renderFollowupOnlyList(){
+  const wrap = document.getElementById('followupOnlyList');
+  if(followupOnlyList.length === 0){
+    wrap.innerHTML = `<div class="followup-empty">Nenhuma ligação registrada ainda.</div>`;
+    return;
+  }
+  wrap.innerHTML = followupOnlyList.map((f,i)=>`
+    <div class="followup-row" data-idx="${i}">
+      <span class="followup-badge">${i+1}ª Ligação</span>
+      <input type="date" class="followup-date" value="${f.data || todayISO()}" />
+      <input type="text" class="followup-note" placeholder="O que foi conversado..." value="${(f.observacao||'').replace(/"/g,'&quot;')}" />
+      <button type="button" class="followup-remove" title="Remover ligação">×</button>
+    </div>
+  `).join('');
+  wrap.querySelectorAll('.followup-row').forEach(row=>{
+    const idx = Number(row.dataset.idx);
+    row.querySelector('.followup-date').addEventListener('change', (e)=>{ followupOnlyList[idx].data = e.target.value; });
+    row.querySelector('.followup-note').addEventListener('input', (e)=>{ followupOnlyList[idx].observacao = e.target.value; });
+    row.querySelector('.followup-remove').addEventListener('click', ()=>{
+      followupOnlyList.splice(idx,1);
+      renderFollowupOnlyList();
+    });
+  });
+}
+
+document.getElementById('btnAddLigacaoStandalone').addEventListener('click', ()=>{
+  followupOnlyList.push({ data: todayISO(), observacao: '' });
+  renderFollowupOnlyList();
+});
+
+document.getElementById('btnSalvarFollowup').addEventListener('click', async ()=>{
+  const id = document.getElementById('followupOrcId').value;
+  const payload = { followup: followupOnlyList.length ? JSON.stringify(followupOnlyList) : null, updated_at: new Date().toISOString() };
+  const { error } = await sb.from('orcamentos').update(payload).eq('id', id);
+  if(error){ showToast('Erro ao salvar follow-up: '+error.message, true); return; }
+  showToast('Follow-up atualizado.');
+  closeModal('modalFollowup');
+  if(followupOnlyOrigem === 'enviados') renderEnviados(); else renderOrcamentos();
+});
+
+/* ---------- Modal de motivo rápido (reprovar direto pela lista) ---------- */
+function openMotivoRapidoModal(id){
+  document.getElementById('motivoRapidoOrcId').value = id;
+  fillSelect('motivoRapidoSelect', state.motivos.filter(m=>m.ativo), 'Selecione o motivo');
+  openModal('modalMotivoRapido');
+}
+document.querySelectorAll('#modalMotivoRapido [data-close]').forEach(btn=>{
+  btn.addEventListener('click', ()=> drawOrcamentosTable());
+});
+document.getElementById('btnConfirmarReprovacao').addEventListener('click', async ()=>{
+  const id = document.getElementById('motivoRapidoOrcId').value;
+  await updateSituacaoRapida(id, { situacao:'Reprovado', motivo_reprovado_id: document.getElementById('motivoRapidoSelect').value || null });
+  closeModal('modalMotivoRapido');
+});
+
 document.getElementById('btnSalvarOrcamento').addEventListener('click', async ()=>{
   const id = document.getElementById('orcId').value;
   const cliente = document.getElementById('orcCliente').value.trim();
@@ -1219,13 +1388,36 @@ function drawEnviadosTable(){
       <td>${fmtDate(o.data_aprovacao)}</td>
       <td>${fmtDate(o.data_fechamento)}</td>
       <td class="row-actions">
+        <button title="Ligações / Follow-up" data-followup="${o.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
+        </button>
         <button title="Editar situação" data-editenv="${o.id}">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+        </button>
+        <button title="Voltar para Orçamentos (desfazer envio)" class="danger" data-revert="${o.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
         </button>
       </td>
     </tr>
   `).join('');
   tbody.querySelectorAll('[data-editenv]').forEach(b=> b.addEventListener('click', ()=> openEnviadoModal(b.dataset.editenv)));
+  tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-revert]').forEach(b=> b.addEventListener('click', ()=> revertEnviado(b.dataset.revert)));
+}
+async function revertEnviado(id){
+  if(!confirm('Voltar este orçamento para a lista de Orçamentos? Isso desfaz o envio ao cliente e apaga a situação/aprovação registradas nesta etapa.')) return;
+  const payload = {
+    situacao: 'Aberto',
+    situacao_cliente: null,
+    data_envio: null,
+    data_aprovacao: null,
+    motivo_reprovado_cliente_id: null,
+    updated_at: new Date().toISOString()
+  };
+  const { error } = await sb.from('orcamentos').update(payload).eq('id', id);
+  if(error){ showToast('Erro ao reverter: '+error.message, true); return; }
+  showToast('Orçamento retornado para a lista de Orçamentos.');
+  renderEnviados();
 }
 function clienteSitBadge(sit){
   if(sit==='Aprovado') return '<span class="badge badge-green">Aprovado</span>';
