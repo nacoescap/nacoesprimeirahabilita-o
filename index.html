@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Autoescola Nações · Gestão de Vendas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --blue-900:#0b3a52;
+  --blue-800:#0d4a6e;
+  --blue-700:#11618c;
+  --blue-600:#1477a8;
+  --yellow-500:#f5c518;
+  --yellow-600:#e0ac00;
+  --bg:#f3f6f8;
+  --surface:#ffffff;
+  --text:#1f2937;
+  --text-muted:#64748b;
+  --border:#e3e8ee;
+  --success:#1f9d55;
+  --success-bg:#e8f8ee;
+  --danger:#d64545;
+  --danger-bg:#fbe9e9;
+  --warning:#e08e0b;
+  --warning-bg:#fdf3e0;
+  --weekend-bg:#fdeaea;
+  --radius:14px;
+  --radius-sm:8px;
+  --shadow:0 2px 10px rgba(13,74,110,0.08);
+  --shadow-lg:0 12px 32px rgba(13,74,110,0.18);
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0;
+  font-family:'Inter',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,.brand{font-family:'Poppins',system-ui,sans-serif;}
+button{font-family:inherit;}
+input,select,textarea{font-family:inherit;}
+
+/* ---------- Utility ---------- */
+.hidden{display:none !important;}
+.flex{display:flex;}
+.flex-col{display:flex;flex-direction:column;}
+.gap-8{gap:8px;}
+.gap-12{gap:12px;}
+.gap-16{gap:16px;}
+.grow{flex:1;}
+.muted{color:var(--text-muted);}
+.small{font-size:12.5px;}
+
+/* ---------- Login ---------- */
+#loginScreen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(160deg,var(--blue-900),var(--blue-700) 60%,var(--blue-600));
+  padding:20px;
+}
+.login-card{
+  background:var(--surface);
+  width:100%;
+  max-width:380px;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow-lg);
+  overflow:hidden;
+}
+.login-brand{
+  background:var(--yellow-500);
+  padding:22px 28px 18px;
+  text-align:center;
+}
+.login-brand .tag{
+  font-weight:800;
+  letter-spacing:1.5px;
+  font-size:15px;
+  color:#161616;
+}
+.login-brand .name{
+  font-weight:700;
+  font-size:30px;
+  color:var(--blue-800);
+  letter-spacing:1px;
+  margin-top:2px;
+}
+.login-body{padding:28px;}
+.login-body h2{margin:0 0 4px;font-size:19px;color:var(--blue-800);}
+.login-body p.subtitle{margin:0 0 20px;color:var(--text-muted);font-size:13.5px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:12.5px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px;}
+.field input,.field select,.field textarea{
+  width:100%;
+  padding:10px 12px;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);
+  font-size:14.5px;
+  color:var(--text);
+  background:#fff;
+  transition:border-color .15s;
+}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--blue-600);}
+.field-with-icon{position:relative;}
+.field-with-icon input{padding-right:42px;}
+.icon-btn{
+  position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;padding:6px;color:var(--text-muted);
+  display:flex;align-items:center;justify-content:center;border-radius:6px;
+}
+.icon-btn:hover{background:var(--bg);color:var(--blue-700);}
+.checkbox-row{display:flex;align-items:center;gap:8px;margin:14px 0 20px;}
+.checkbox-row input{width:16px;height:16px;accent-color:var(--blue-600);}
+.checkbox-row label{font-size:13.5px;color:var(--text-muted);cursor:pointer;}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  border:none;border-radius:var(--radius-sm);
+  padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;
+  transition:filter .15s, transform .05s;
+}
+.btn:active{transform:translateY(1px);}
+.btn-primary{background:var(--blue-700);color:#fff;}
+.btn-primary:hover{filter:brightness(1.08);}
+.btn-block{width:100%;}
+.btn-yellow{background:var(--yellow-500);color:#161616;}
+.btn-yellow:hover{filter:brightness(1.05);}
+.btn-secondary{background:var(--bg);color:var(--blue-800);border:1.5px solid var(--border);}
+.btn-secondary:hover{border-color:var(--blue-600);}
+.btn-danger{background:var(--danger-bg);color:var(--danger);}
+.btn-danger:hover{filter:brightness(0.97);}
+.btn-sm{padding:6px 10px;font-size:12.5px;border-radius:7px;}
+.error-msg{color:var(--danger);font-size:13px;margin-top:10px;min-height:16px;}
+
+/* ---------- App shell ---------- */
+#appShell{display:flex;min-height:100vh;}
+.sidebar{
+  width:250px;flex-shrink:0;
+  background:linear-gradient(180deg,var(--blue-900),var(--blue-800));
+  color:#fff;
+  display:flex;flex-direction:column;
+  transition:width .18s ease;
+  position:relative;
+  z-index:20;
+}
+.sidebar.collapsed{width:70px;}
+.sidebar-header{
+  display:flex;align-items:center;gap:10px;
+  padding:18px 16px;border-bottom:1px solid rgba(255,255,255,0.12);
+}
+.sidebar-badge{
+  width:34px;height:34px;border-radius:9px;background:var(--yellow-500);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  font-weight:800;color:#161616;font-family:'Poppins',sans-serif;font-size:15px;
+}
+.sidebar-title{font-weight:700;font-size:15px;line-height:1.15;white-space:nowrap;overflow:hidden;}
+.sidebar-title small{display:block;font-weight:400;font-size:11px;color:rgba(255,255,255,0.65);}
+.sidebar.collapsed .sidebar-title{display:none;}
+.sidebar-toggle{
+  margin-left:auto;background:none;border:none;color:rgba(255,255,255,0.75);cursor:pointer;
+  padding:4px;border-radius:6px;flex-shrink:0;
+}
+.sidebar-toggle:hover{background:rgba(255,255,255,0.1);}
+.sidebar-nav{flex:1;overflow-y:auto;padding:10px 0;}
+.nav-group{margin-bottom:4px;}
+.nav-group-label{
+  padding:12px 18px 4px;font-size:10.5px;font-weight:700;letter-spacing:1px;
+  color:rgba(255,255,255,0.45);text-transform:uppercase;white-space:nowrap;overflow:hidden;
+}
+.sidebar.collapsed .nav-group-label{display:none;}
+.nav-item{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 18px;color:rgba(255,255,255,0.82);cursor:pointer;
+  font-size:13.8px;font-weight:500;border-left:3px solid transparent;white-space:nowrap;overflow:hidden;
+}
+.nav-item svg{flex-shrink:0;width:18px;height:18px;}
+.nav-item:hover{background:rgba(255,255,255,0.07);color:#fff;}
+.nav-item.active{background:rgba(255,255,255,0.12);color:#fff;border-left-color:var(--yellow-500);font-weight:600;}
+.sidebar.collapsed .nav-item span{display:none;}
+.sidebar-footer{padding:14px 16px;border-top:1px solid rgba(255,255,255,0.12);}
+.main-area{flex:1;display:flex;flex-direction:column;min-width:0;}
+.topbar{
+  height:62px;background:var(--surface);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 24px;justify-content:space-between;
+  position:sticky;top:0;z-index:10;
+}
+.topbar h1{font-size:18px;margin:0;color:var(--blue-800);}
+.topbar .user-chip{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--text-muted);}
+.topbar .avatar{width:32px;height:32px;border-radius:50%;background:var(--blue-700);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;}
+.content{padding:24px;flex:1;overflow-x:auto;}
+.view{display:none;}
+.view.active{display:block;animation:fadeIn .18s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+/* ---------- Cards / dashboard ---------- */
+.card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:22px;}
+.stat-card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px;border-top:4px solid var(--blue-600);}
+.stat-card .label{font-size:12.5px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.3px;}
+.stat-card .value{font-size:26px;font-weight:700;color:var(--blue-800);margin-top:6px;font-family:'Poppins',sans-serif;}
+.stat-card.yellow{border-top-color:var(--yellow-500);}
+.stat-card.green{border-top-color:var(--success);}
+.stat-card.red{border-top-color:var(--danger);}
+
+/* ---------- Toolbars / filters ---------- */
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:16px;}
+.toolbar input,.toolbar select{
+  padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13.5px;background:#fff;
+}
+.toolbar .search-input{min-width:220px;}
+.segmented{display:flex;background:var(--bg);border-radius:var(--radius-sm);padding:3px;border:1.5px solid var(--border);}
+.segmented button{
+  border:none;background:none;padding:7px 14px;font-size:13px;font-weight:600;color:var(--text-muted);
+  border-radius:6px;cursor:pointer;
+}
+.segmented button.active{background:var(--blue-700);color:#fff;}
+.spacer{flex:1;}
+
+/* ---------- Tables ---------- */
+.table-wrap{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:auto;}
+table{width:100%;border-collapse:collapse;font-size:13.3px;min-width:600px;}
+thead th{
+  background:var(--blue-800);color:#fff;text-align:left;padding:11px 12px;
+  font-weight:600;font-size:12.3px;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;
+  position:sticky;top:0;
+}
+tbody td{padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap;}
+tbody tr:hover{background:#f8fafc;}
+tbody tr.weekend{background:var(--weekend-bg);}
+tbody tr.weekend:hover{background:#fbdede;}
+tbody tr:last-child td{border-bottom:none;}
+.empty-row td{text-align:center;color:var(--text-muted);padding:32px;white-space:normal;}
+.obs-input{width:150px;padding:5px 7px;border:1px solid var(--border);border-radius:6px;font-size:12.5px;}
+
+/* Badges */
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:700;letter-spacing:.2px;white-space:nowrap;}
+.badge-blue{background:#e2f0f7;color:var(--blue-700);}
+.badge-yellow{background:#fdf1cd;color:#9a6c00;}
+.badge-green{background:var(--success-bg);color:var(--success);}
+.badge-red{background:var(--danger-bg);color:var(--danger);}
+.badge-gray{background:#eef1f4;color:var(--text-muted);}
+
+.row-actions{display:flex;gap:6px;}
+.row-actions button{
+  border:none;background:var(--bg);color:var(--blue-700);border-radius:6px;padding:6px 8px;cursor:pointer;
+  display:flex;align-items:center;
+}
+.row-actions button:hover{background:#e2eef5;}
+.row-actions button.danger{color:var(--danger);}
+.row-actions button.danger:hover{background:var(--danger-bg);}
+
+/* ---------- Modal ---------- */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(11,58,82,0.45);display:flex;align-items:center;justify-content:center;
+  z-index:100;padding:20px;
+}
+.modal{
+  background:var(--surface);border-radius:var(--radius);width:100%;max-width:560px;
+  max-height:90vh;display:flex;flex-direction:column;box-shadow:var(--shadow-lg);
+}
+.modal.modal-wide{max-width:680px;}
+.modal-header{
+  padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;
+}
+.modal-header h3{margin:0;font-size:17px;color:var(--blue-800);}
+.modal-close{background:none;border:none;cursor:pointer;color:var(--text-muted);padding:4px;border-radius:6px;}
+.modal-close:hover{background:var(--bg);}
+.modal-body{padding:22px;overflow-y:auto;}
+.modal-footer{padding:16px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px;}
+.form-grid .field.full{grid-column:1 / -1;}
+.select-with-btn{display:flex;gap:6px;}
+.select-with-btn select{flex:1;}
+.select-with-btn button{
+  flex-shrink:0;border:1.5px solid var(--border);background:var(--bg);border-radius:var(--radius-sm);
+  padding:0 10px;cursor:pointer;color:var(--blue-700);
+}
+.select-with-btn button:hover{border-color:var(--blue-600);}
+
+/* Indicator legend */
+.legend-row{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-muted);margin-bottom:12px;}
+.legend-swatch{width:12px;height:12px;border-radius:3px;background:var(--weekend-bg);border:1px solid #f0c9c9;}
+
+.section-title{font-size:16px;font-weight:700;color:var(--blue-800);margin:0 0 14px;}
+.helper-text{font-size:12.5px;color:var(--text-muted);margin-top:-6px;margin-bottom:16px;}
+
+@media (max-width:900px){
+  .sidebar{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);}
+  .sidebar.mobile-open{transform:translateX(0);}
+  .sidebar.collapsed{width:250px;}
+  .form-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================= -->
+<!-- LOGIN SCREEN                                                   -->
+<!-- ============================================================= -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="tag">AUTOESCOLA</div>
+      <div class="name">NAÇÕES</div>
+    </div>
+    <div class="login-body">
+      <h2>Gestão de Vendas</h2>
+      <p class="subtitle">Primeira habilitação · acesso restrito</p>
+      <form id="loginForm">
+        <div class="field">
+          <label>Usuário</label>
+          <input type="text" id="loginUser" autocomplete="username" placeholder="admin" />
+        </div>
+        <div class="field">
+          <label>Senha</label>
+          <div class="field-with-icon">
+            <input type="password" id="loginPass" autocomplete="current-password" placeholder="••••••••" />
+            <button type="button" class="icon-btn" id="togglePass" title="Mostrar/ocultar senha">
+              <svg id="eyeIcon" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="checkbox-row">
+          <input type="checkbox" id="rememberMe" />
+          <label for="rememberMe">Salvar usuário e senha neste dispositivo</label>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+        <div class="error-msg" id="loginError"></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- APP SHELL                                                      -->
+<!-- ============================================================= -->
+<div id="appShell" class="hidden">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-badge">AN</div>
+      <div class="sidebar-title">Nações<small>Gestão de Vendas</small></div>
+      <button class="sidebar-toggle" id="sidebarToggle" title="Recolher menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+    </div>
+    <nav class="sidebar-nav" id="sidebarNav">
+      <div class="nav-group">
+        <div class="nav-item" data-view="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+          <span>Painel</span>
+        </div>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Vendas</div>
+        <div class="nav-item" data-view="orcamentos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h6M9 11h6"/></svg>
+          <span>Orçamentos</span>
+        </div>
+        <div class="nav-item" data-view="enviados">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4Z"/></svg>
+          <span>Enviado ao Cliente</span>
+        </div>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Indicadores</div>
+        <div class="nav-item" data-view="ind-contato">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-4"/></svg>
+          <span>Contatos por Origem</span>
+        </div>
+        <div class="nav-item" data-view="ind-propostas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>
+          <span>Propostas Enviadas</span>
+        </div>
+        <div class="nav-item" data-view="ind-contatos-realizados">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          <span>Contatos Realizados</span>
+        </div>
+        <div class="nav-item" data-view="ind-aprovados">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+          <span>Aprovados</span>
+        </div>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Cadastros</div>
+        <div class="nav-item" data-view="cad-vendedores">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Vendedores</span>
+        </div>
+        <div class="nav-item" data-view="cad-origens">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20Z"/><path d="M2 12h20"/></svg>
+          <span>Origens</span>
+        </div>
+        <div class="nav-item" data-view="cad-motivos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          <span>Motivos Reprovação</span>
+        </div>
+        <div class="nav-item" data-view="cad-metas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          <span>Metas</span>
+        </div>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="nav-item" id="logoutBtn" style="border-radius:8px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+        <span>Sair</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-area">
+    <header class="topbar">
+      <h1 id="topbarTitle">Painel</h1>
+      <div class="user-chip">
+        <div class="avatar">A</div>
+        <span>admin</span>
+      </div>
+    </header>
+
+    <main class="content" id="contentArea">
+
+      <!-- ============ DASHBOARD ============ -->
+      <section class="view" id="view-dashboard">
+        <div class="stat-grid" id="dashboardStats"></div>
+        <div class="card">
+          <h3 class="section-title">Bem-vindo(a)</h3>
+          <p class="muted">Use o menu à esquerda para lançar orçamentos, acompanhar propostas enviadas e visualizar os indicadores de contato, propostas, contatos realizados e aprovações do mês.</p>
+        </div>
+      </section>
+
+      <!-- ============ ORÇAMENTOS ============ -->
+      <section class="view" id="view-orcamentos">
+        <div class="toolbar">
+          <input type="text" class="search-input" id="orcSearch" placeholder="Buscar por cliente, CPF ou WhatsApp..." />
+          <select id="orcFiltroSituacao">
+            <option value="">Situação: Todas</option>
+            <option value="Aberto">Aberto</option>
+            <option value="Reprovado">Reprovado</option>
+          </select>
+          <select id="orcFiltroVendedor"><option value="">Vendedor: Todos</option></select>
+          <select id="orcFiltroOrigem"><option value="">Origem: Todas</option></select>
+          <div class="spacer"></div>
+          <button class="btn btn-yellow" id="btnNovoOrcamento">+ Novo Orçamento</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Abertura</th><th>Cliente</th><th>WhatsApp</th><th>CPF</th><th>Valor</th>
+              <th>Aulas</th><th>Origem</th><th>Vendedor</th><th>Situação</th><th>Fechamento</th><th>Ações</th>
+            </tr></thead>
+            <tbody id="orcTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ ENVIADO AO CLIENTE ============ -->
+      <section class="view" id="view-enviados">
+        <div class="toolbar">
+          <input type="text" class="search-input" id="envSearch" placeholder="Buscar por cliente, CPF ou WhatsApp..." />
+          <select id="envFiltroSituacao">
+            <option value="">Situação: Todas</option>
+            <option value="Aguardando Cliente">Aguardando Cliente</option>
+            <option value="Reprovado">Reprovado</option>
+            <option value="Aprovado">Aprovado</option>
+          </select>
+          <div class="spacer"></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Envio</th><th>Cliente</th><th>WhatsApp</th><th>Valor</th><th>Origem</th>
+              <th>Vendedor</th><th>Situação Cliente</th><th>Data Aprovação</th><th>Fechamento</th><th>Ações</th>
+            </tr></thead>
+            <tbody id="envTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ INDICADOR: CONTATO POR ORIGEM ============ -->
+      <section class="view" id="view-ind-contato">
+        <div class="toolbar" id="indContatoToolbar"></div>
+        <div class="legend-row"><span class="legend-swatch"></span> Fim de semana</div>
+        <div class="table-wrap"><table><thead id="indContatoHead"></thead><tbody id="indContatoBody"></tbody></table></div>
+      </section>
+
+      <!-- ============ INDICADOR: PROPOSTAS ENVIADAS ============ -->
+      <section class="view" id="view-ind-propostas">
+        <div class="toolbar" id="indPropostasToolbar"></div>
+        <div class="legend-row"><span class="legend-swatch"></span> Fim de semana</div>
+        <div class="table-wrap"><table><thead id="indPropostasHead"></thead><tbody id="indPropostasBody"></tbody></table></div>
+      </section>
+
+      <!-- ============ INDICADOR: CONTATOS REALIZADOS ============ -->
+      <section class="view" id="view-ind-contatos-realizados">
+        <div class="toolbar" id="indContatosRealizadosToolbar"></div>
+        <div class="legend-row"><span class="legend-swatch"></span> Fim de semana</div>
+        <div class="table-wrap"><table><thead id="indContatosRealizadosHead"></thead><tbody id="indContatosRealizadosBody"></tbody></table></div>
+      </section>
+
+      <!-- ============ INDICADOR: APROVADOS ============ -->
+      <section class="view" id="view-ind-aprovados">
+        <div class="toolbar" id="indAprovadosToolbar"></div>
+        <div class="legend-row"><span class="legend-swatch"></span> Fim de semana</div>
+        <div class="table-wrap"><table><thead id="indAprovadosHead"></thead><tbody id="indAprovadosBody"></tbody></table></div>
+      </section>
+
+      <!-- ============ CADASTRO: VENDEDORES ============ -->
+      <section class="view" id="view-cad-vendedores">
+        <div class="toolbar"><div class="spacer"></div><button class="btn btn-yellow" id="btnNovoVendedor">+ Novo Vendedor</button></div>
+        <div class="table-wrap"><table><thead><tr><th>Nome</th><th>Status</th><th>Ações</th></tr></thead><tbody id="vendedoresTableBody"></tbody></table></div>
+      </section>
+
+      <!-- ============ CADASTRO: ORIGENS ============ -->
+      <section class="view" id="view-cad-origens">
+        <div class="toolbar"><div class="spacer"></div><button class="btn btn-yellow" id="btnNovaOrigem">+ Nova Origem</button></div>
+        <div class="table-wrap"><table><thead><tr><th>Nome</th><th>Status</th><th>Ações</th></tr></thead><tbody id="origensTableBody"></tbody></table></div>
+      </section>
+
+      <!-- ============ CADASTRO: MOTIVOS ============ -->
+      <section class="view" id="view-cad-motivos">
+        <div class="toolbar"><div class="spacer"></div><button class="btn btn-yellow" id="btnNovoMotivo">+ Novo Motivo</button></div>
+        <div class="table-wrap"><table><thead><tr><th>Nome</th><th>Status</th><th>Ações</th></tr></thead><tbody id="motivosTableBody"></tbody></table></div>
+      </section>
+
+      <!-- ============ CADASTRO: METAS ============ -->
+      <section class="view" id="view-cad-metas">
+        <div class="toolbar" id="metasToolbar"></div>
+        <p class="helper-text">Defina a meta de quantidade e/ou valor para cada dia do mês selecionado. Use "Distribuir total" para preencher automaticamente os dias úteis a partir de uma meta mensal.</p>
+        <div class="table-wrap"><table><thead><tr><th>Dia</th><th>Dia da Semana</th><th>Meta Qtd.</th><th>Meta Valor (R$)</th></tr></thead><tbody id="metasTableBody"></tbody></table></div>
+        <div style="margin-top:14px;"><button class="btn btn-primary" id="btnSalvarMetas">Salvar Metas</button></div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- MODAL: ORÇAMENTO                                               -->
+<!-- ============================================================= -->
+<div class="modal-overlay hidden" id="modalOrcamento">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <h3 id="modalOrcamentoTitle">Novo Orçamento</h3>
+      <button class="modal-close" data-close="modalOrcamento">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="orcId" />
+      <div class="form-grid">
+        <div class="field"><label>Data de Abertura</label><input type="date" id="orcDataAbertura" /></div>
+        <div class="field"><label>Cliente</label><input type="text" id="orcCliente" placeholder="Nome completo" /></div>
+        <div class="field"><label>WhatsApp</label><input type="text" id="orcWhatsapp" placeholder="(00) 00000-0000" maxlength="15" /></div>
+        <div class="field"><label>CPF</label><input type="text" id="orcCpf" placeholder="000.000.000-00" maxlength="14" /></div>
+        <div class="field"><label>Valor (R$)</label><input type="number" step="0.01" min="0" id="orcValor" placeholder="0,00" /></div>
+        <div class="field"><label>Número de Aulas</label><input type="number" min="0" id="orcAulas" placeholder="0" /></div>
+        <div class="field">
+          <label>Origem</label>
+          <div class="select-with-btn">
+            <select id="orcOrigem"></select>
+            <button type="button" title="Gerenciar origens" data-goto="cad-origens">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Vendedor</label>
+          <div class="select-with-btn">
+            <select id="orcVendedor"></select>
+            <button type="button" title="Gerenciar vendedores" data-goto="cad-vendedores">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="field full"><label>Follow-up</label><textarea id="orcFollowup" rows="2" placeholder="Observações de acompanhamento..."></textarea></div>
+        <div class="field">
+          <label>Situação</label>
+          <select id="orcSituacao">
+            <option value="Aberto">Aberto</option>
+            <option value="Enviado ao Cliente">Enviado ao Cliente</option>
+            <option value="Reprovado">Reprovado</option>
+          </select>
+        </div>
+        <div class="field hidden" id="orcMotivoWrap">
+          <label>Motivo da Reprovação</label>
+          <div class="select-with-btn">
+            <select id="orcMotivo"></select>
+            <button type="button" title="Gerenciar motivos" data-goto="cad-motivos">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="field"><label>Data de Fechamento</label><input type="date" id="orcDataFechamento" /></div>
+      </div>
+      <p class="helper-text" id="orcEnvioHint">Ao marcar a situação como "Enviado ao Cliente", este orçamento sairá desta lista e passará para a tela "Enviado ao Cliente".</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-close="modalOrcamento">Cancelar</button>
+      <button class="btn btn-primary" id="btnSalvarOrcamento">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- MODAL: ENVIADO AO CLIENTE (edição de situação)                 -->
+<!-- ============================================================= -->
+<div class="modal-overlay hidden" id="modalEnviado">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Atualizar Situação do Cliente</h3>
+      <button class="modal-close" data-close="modalEnviado">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="envId" />
+      <div class="field"><label>Cliente</label><input type="text" id="envClienteNome" disabled /></div>
+      <div class="field">
+        <label>Situação Cliente</label>
+        <select id="envSituacaoCliente">
+          <option value="Aguardando Cliente">Aguardando Cliente</option>
+          <option value="Reprovado">Reprovado</option>
+          <option value="Aprovado">Aprovado</option>
+        </select>
+      </div>
+      <div class="field hidden" id="envMotivoWrap">
+        <label>Motivo da Reprovação</label>
+        <select id="envMotivo"></select>
+      </div>
+      <div class="field"><label>Data de Fechamento</label><input type="date" id="envDataFechamento" /></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-close="modalEnviado">Cancelar</button>
+      <button class="btn btn-primary" id="btnSalvarEnviado">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- MODAL: CADASTRO SIMPLES (Vendedor / Origem / Motivo)           -->
+<!-- ============================================================= -->
+<div class="modal-overlay hidden" id="modalCadastroSimples">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalCadastroTitle">Novo Item</h3>
+      <button class="modal-close" data-close="modalCadastroSimples">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="cadId" />
+      <input type="hidden" id="cadTabela" />
+      <div class="field"><label>Nome</label><input type="text" id="cadNome" placeholder="Digite o nome" /></div>
+      <div class="checkbox-row"><input type="checkbox" id="cadAtivo" checked /><label for="cadAtivo">Ativo</label></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-close="modalCadastroSimples">Cancelar</button>
+      <button class="btn btn-primary" id="btnSalvarCadastro">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   CONFIGURAÇÃO DO SUPABASE
+   Substitua pelos dados do SEU projeto (Project Settings > API).
+   ===================================================================== */
+const SUPABASE_URL = 'https://ktokmkbaxmwuwjzttqgj.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt0b2tta2JheG13dXdqenR0cWdqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyODczODYsImV4cCI6MjA5ODg2MzM4Nn0.e69upZD_J5qeudov8Yc-V70yz020QCCppGOJ2se49Ag';
+let sb = null;
+try{
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}catch(err){
+  console.error('Não foi possível iniciar a conexão com o Supabase:', err);
+}
+
+/* Login fixo da tela (controle de acesso simples, ver schema.sql para notas de segurança) */
+const AUTH_USER = 'admin';
+const AUTH_PASS = 'C@pnac_2026';
+
+/* =====================================================================
+   ESTADO GLOBAL
+   ===================================================================== */
+const state = {
+  origens: [],
+  vendedores: [],
+  motivos: [],
+  orcamentos: [],
+  enviados: [],
+  currentView: 'dashboard',
+  indicadorModo: { contato: 'qtd', propostas: 'qtd', contatosRealizados: 'qtd', aprovados: 'qtd' },
+  indicadorPeriodo: { contato: {}, propostas: {}, contatosRealizados: {}, aprovados: {} },
+  metasPeriodo: { ano: new Date().getFullYear(), mes: new Date().getMonth() + 1 }
+};
+
+const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const DIAS_SEMANA = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+/* =====================================================================
+   HELPERS
+   ===================================================================== */
+function fmtMoney(v){
+  return (Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+}
+function fmtDate(iso){
+  if(!iso) return '—';
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+function todayISO(){
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function daysInMonth(ano, mes){ return new Date(ano, mes, 0).getDate(); }
+function weekdayOf(ano, mes, dia){ return new Date(ano, mes-1, dia).getDay(); }
+function isWeekend(ano, mes, dia){ const w = weekdayOf(ano,mes,dia); return w===0 || w===6; }
+function maskCPF(v){
+  v = v.replace(/\D/g,'').slice(0,11);
+  v = v.replace(/(\d{3})(\d)/,'$1.$2');
+  v = v.replace(/(\d{3})(\d)/,'$1.$2');
+  v = v.replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+  return v;
+}
+function maskPhone(v){
+  v = v.replace(/\D/g,'').slice(0,11);
+  if(v.length>10) v = v.replace(/(\d{2})(\d{5})(\d{4})/,'($1) $2-$3');
+  else if(v.length>6) v = v.replace(/(\d{2})(\d{4})(\d{0,4})/,'($1) $2-$3');
+  else if(v.length>2) v = v.replace(/(\d{2})(\d{0,5})/,'($1) $2');
+  else v = v.replace(/(\d{0,2})/,'($1');
+  return v;
+}
+function showToast(msg, isError){
+  let t = document.getElementById('toastMsg');
+  if(!t){
+    t = document.createElement('div');
+    t.id = 'toastMsg';
+    t.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:999;padding:13px 18px;border-radius:10px;font-size:13.5px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,0.18);transition:opacity .2s;';
+    document.body.appendChild(t);
+  }
+  t.style.background = isError ? '#d64545' : '#1f9d55';
+  t.style.color = '#fff';
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>{ t.style.opacity='0'; }, 2600);
+}
+function openModal(id){ document.getElementById(id).classList.remove('hidden'); }
+function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
+
+/* =====================================================================
+   LOGIN
+   ===================================================================== */
+function safeStorage(action, ...args){
+  try{
+    return window.localStorage[action](...args);
+  }catch(e){
+    console.warn('localStorage indisponível neste navegador/contexto:', e);
+    return null;
+  }
+}
+
+const loginForm = document.getElementById('loginForm');
+const loginUser = document.getElementById('loginUser');
+const loginPass = document.getElementById('loginPass');
+const loginError = document.getElementById('loginError');
+const rememberMe = document.getElementById('rememberMe');
+
+document.getElementById('togglePass').addEventListener('click', ()=>{
+  const isPass = loginPass.type === 'password';
+  loginPass.type = isPass ? 'text' : 'password';
+  document.getElementById('eyeIcon').innerHTML = isPass
+    ? '<path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.6 21.6 0 0 1 5.06-6.94M9.9 4.24A10.5 10.5 0 0 1 12 4c7 0 11 8 11 8a21.6 21.6 0 0 1-3.22 4.44M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/>'
+    : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/>';
+});
+
+(function prefillLogin(){
+  try{
+    const saved = JSON.parse(safeStorage('getItem','nacoes_saved_login') || 'null');
+    if(saved){
+      loginUser.value = saved.u || '';
+      loginPass.value = saved.p || '';
+      rememberMe.checked = true;
+    }
+  }catch(e){}
+  if(safeStorage('getItem','nacoes_session') === 'active'){
+    doLogin(true);
+  }
+})();
+
+loginForm.addEventListener('submit', (e)=>{
+  e.preventDefault();
+  doLogin(false);
+});
+
+function doLogin(fromSession){
+  const u = loginUser.value.trim();
+  const p = loginPass.value;
+  if(!fromSession && (u !== AUTH_USER || p !== AUTH_PASS)){
+    loginError.textContent = 'Usuário ou senha inválidos.';
+    return;
+  }
+  loginError.textContent = '';
+  if(rememberMe.checked){
+    safeStorage('setItem','nacoes_saved_login', JSON.stringify({u,p}));
+  } else {
+    safeStorage('removeItem','nacoes_saved_login');
+  }
+  safeStorage('setItem','nacoes_session','active');
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('appShell').classList.remove('hidden');
+  initApp();
+}
+
+document.getElementById('logoutBtn').addEventListener('click', ()=>{
+  safeStorage('removeItem','nacoes_session');
+  document.getElementById('appShell').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+});
+
+/* =====================================================================
+   NAVEGAÇÃO
+   ===================================================================== */
+const viewTitles = {
+  'dashboard':'Painel','orcamentos':'Orçamentos','enviados':'Enviado ao Cliente',
+  'ind-contato':'Indicador de Contato por Origem','ind-propostas':'Indicador de Propostas Enviadas',
+  'ind-contatos-realizados':'Indicador de Contatos Realizados','ind-aprovados':'Indicador de Aprovados',
+  'cad-vendedores':'Cadastro de Vendedores','cad-origens':'Cadastro de Origens',
+  'cad-motivos':'Cadastro de Motivos de Reprovação','cad-metas':'Cadastro de Metas'
+};
+
+function goToView(view){
+  state.currentView = view;
+  document.querySelectorAll('.nav-item[data-view]').forEach(el=>{
+    el.classList.toggle('active', el.dataset.view === view);
+  });
+  document.querySelectorAll('.view').forEach(el=> el.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  document.getElementById('topbarTitle').textContent = viewTitles[view] || '';
+
+  if(view === 'dashboard') renderDashboard();
+  if(view === 'orcamentos') renderOrcamentos();
+  if(view === 'enviados') renderEnviados();
+  if(view === 'cad-vendedores') renderCadastroSimples('vendedores');
+  if(view === 'cad-origens') renderCadastroSimples('origens');
+  if(view === 'cad-motivos') renderCadastroSimples('motivos_reprovacao');
+  if(view === 'ind-contato') renderIndicadorContato();
+  if(view === 'ind-propostas') renderIndicadorMeta('propostas');
+  if(view === 'ind-contatos-realizados') renderIndicadorMeta('contatos_realizados');
+  if(view === 'ind-aprovados') renderIndicadorMeta('aprovados');
+  if(view === 'cad-metas') renderCadastroMetas();
+}
+
+document.querySelectorAll('.nav-item[data-view]').forEach(el=>{
+  el.addEventListener('click', ()=> goToView(el.dataset.view));
+});
+document.querySelectorAll('[data-goto]').forEach(el=>{
+  el.addEventListener('click', ()=>{
+    document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.add('hidden'));
+    goToView(el.dataset.goto);
+  });
+});
+document.getElementById('sidebarToggle').addEventListener('click', ()=>{
+  document.getElementById('sidebar').classList.toggle('collapsed');
+});
+document.querySelectorAll('.modal-close, [data-close]').forEach(el=>{
+  el.addEventListener('click', ()=> closeModal(el.dataset.close));
+});
+
+/* =====================================================================
+   CARGA INICIAL DE DADOS DE APOIO
+   ===================================================================== */
+async function loadLookups(){
+  if(!sb){
+    showToast('Não foi possível conectar ao Supabase (verifique sua internet e a configuração no início do script).', true);
+    return;
+  }
+  const [{data:origens}, {data:vendedores}, {data:motivos}] = await Promise.all([
+    sb.from('origens').select('*').order('nome'),
+    sb.from('vendedores').select('*').order('nome'),
+    sb.from('motivos_reprovacao').select('*').order('nome')
+  ]);
+  state.origens = origens || [];
+  state.vendedores = vendedores || [];
+  state.motivos = motivos || [];
+  fillSelect('orcOrigem', state.origens.filter(o=>o.ativo), 'Selecione a origem');
+  fillSelect('orcVendedor', state.vendedores.filter(v=>v.ativo), 'Selecione o vendedor');
+  fillSelect('orcMotivo', state.motivos.filter(m=>m.ativo), 'Selecione o motivo');
+  fillSelect('envMotivo', state.motivos.filter(m=>m.ativo), 'Selecione o motivo');
+  fillFilterSelect('orcFiltroVendedor', state.vendedores, 'Vendedor: Todos');
+  fillFilterSelect('orcFiltroOrigem', state.origens, 'Origem: Todas');
+}
+function fillSelect(id, list, placeholder){
+  const el = document.getElementById(id);
+  el.innerHTML = (placeholder ? `<option value="">${placeholder}</option>` : '') +
+    list.map(i=>`<option value="${i.id}">${i.nome}</option>`).join('');
+}
+function fillFilterSelect(id, list, placeholder){
+  const el = document.getElementById(id);
+  el.innerHTML = `<option value="">${placeholder}</option>` + list.map(i=>`<option value="${i.id}">${i.nome}</option>`).join('');
+}
+
+async function initApp(){
+  await loadLookups();
+  goToView('dashboard');
+}
+
+/* =====================================================================
+   DASHBOARD
+   ===================================================================== */
+async function renderDashboard(){
+  const grid = document.getElementById('dashboardStats');
+  grid.innerHTML = '<p class="muted">Carregando indicadores...</p>';
+  const now = new Date();
+  const inicioMes = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-01';
+
+  const [{ count: countAbertos }, { count: countAguardando }, { data: aprovadosMes }] = await Promise.all([
+    sb.from('orcamentos').select('*',{count:'exact',head:true}).eq('situacao','Aberto'),
+    sb.from('orcamentos').select('*',{count:'exact',head:true}).eq('situacao','Enviado ao Cliente').eq('situacao_cliente','Aguardando Cliente'),
+    sb.from('orcamentos').select('valor').eq('situacao_cliente','Aprovado').gte('data_aprovacao', inicioMes)
+  ]);
+  const totalAprovado = (aprovadosMes||[]).reduce((s,r)=> s + (Number(r.valor)||0), 0);
+
+  grid.innerHTML = `
+    <div class="stat-card"><div class="label">Orçamentos em Aberto</div><div class="value">${countAbertos||0}</div></div>
+    <div class="stat-card yellow"><div class="label">Aguardando Cliente</div><div class="value">${countAguardando||0}</div></div>
+    <div class="stat-card green"><div class="label">Aprovados no Mês</div><div class="value">${(aprovadosMes||[]).length}</div></div>
+    <div class="stat-card"><div class="label">Valor Aprovado no Mês</div><div class="value">${fmtMoney(totalAprovado)}</div></div>
+  `;
+}
+
+/* =====================================================================
+   ORÇAMENTOS
+   ===================================================================== */
+async function fetchOrcamentos(){
+  const { data, error } = await sb.from('orcamentos')
+    .select('*, origem:origens(id,nome), vendedor:vendedores(id,nome), motivo:motivos_reprovacao(id,nome)')
+    .neq('situacao','Enviado ao Cliente')
+    .order('data_abertura',{ascending:false});
+  if(error){ showToast('Erro ao carregar orçamentos: '+error.message, true); return []; }
+  return data || [];
+}
+
+async function renderOrcamentos(){
+  state.orcamentos = await fetchOrcamentos();
+  drawOrcamentosTable();
+}
+
+function drawOrcamentosTable(){
+  const search = document.getElementById('orcSearch').value.toLowerCase();
+  const fSit = document.getElementById('orcFiltroSituacao').value;
+  const fVend = document.getElementById('orcFiltroVendedor').value;
+  const fOri = document.getElementById('orcFiltroOrigem').value;
+
+  let rows = state.orcamentos.filter(o=>{
+    if(fSit && o.situacao !== fSit) return false;
+    if(fVend && o.vendedor?.id !== fVend) return false;
+    if(fOri && o.origem?.id !== fOri) return false;
+    if(search){
+      const blob = `${o.cliente||''} ${o.cpf||''} ${o.whatsapp||''}`.toLowerCase();
+      if(!blob.includes(search)) return false;
+    }
+    return true;
+  });
+
+  const tbody = document.getElementById('orcTableBody');
+  if(rows.length === 0){
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="11">Nenhum orçamento encontrado.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(o=>`
+    <tr>
+      <td>${fmtDate(o.data_abertura)}</td>
+      <td>${o.cliente||''}</td>
+      <td>${o.whatsapp||'—'}</td>
+      <td>${o.cpf||'—'}</td>
+      <td>${fmtMoney(o.valor)}</td>
+      <td>${o.numero_aulas||0}</td>
+      <td>${o.origem?.nome||'—'}</td>
+      <td>${o.vendedor?.nome||'—'}</td>
+      <td>${situacaoBadge(o.situacao)}</td>
+      <td>${fmtDate(o.data_fechamento)}</td>
+      <td class="row-actions">
+        <button title="Editar" data-edit="${o.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+        </button>
+        <button title="Excluir" class="danger" data-del="${o.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+
+  tbody.querySelectorAll('[data-edit]').forEach(b=> b.addEventListener('click', ()=> openOrcamentoModal(b.dataset.edit)));
+  tbody.querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', ()=> deleteOrcamento(b.dataset.del)));
+}
+function situacaoBadge(sit){
+  if(sit==='Aberto') return '<span class="badge badge-blue">Aberto</span>';
+  if(sit==='Reprovado') return '<span class="badge badge-red">Reprovado</span>';
+  if(sit==='Enviado ao Cliente') return '<span class="badge badge-yellow">Enviado ao Cliente</span>';
+  return `<span class="badge badge-gray">${sit||'—'}</span>`;
+}
+
+['orcSearch','orcFiltroSituacao','orcFiltroVendedor','orcFiltroOrigem'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', drawOrcamentosTable);
+  document.getElementById(id).addEventListener('change', drawOrcamentosTable);
+});
+
+document.getElementById('btnNovoOrcamento').addEventListener('click', ()=> openOrcamentoModal(null));
+document.getElementById('orcCpf').addEventListener('input', (e)=>{ e.target.value = maskCPF(e.target.value); });
+document.getElementById('orcWhatsapp').addEventListener('input', (e)=>{ e.target.value = maskPhone(e.target.value); });
+document.getElementById('orcSituacao').addEventListener('change', updateOrcSituacaoUI);
+
+function updateOrcSituacaoUI(){
+  const sit = document.getElementById('orcSituacao').value;
+  document.getElementById('orcMotivoWrap').classList.toggle('hidden', sit !== 'Reprovado');
+  document.getElementById('orcEnvioHint').style.display = sit === 'Enviado ao Cliente' ? 'block' : 'none';
+}
+
+function openOrcamentoModal(id){
+  const editing = !!id;
+  document.getElementById('modalOrcamentoTitle').textContent = editing ? 'Editar Orçamento' : 'Novo Orçamento';
+  document.getElementById('orcId').value = id || '';
+  if(editing){
+    const o = state.orcamentos.find(x=>x.id===id);
+    document.getElementById('orcDataAbertura').value = o.data_abertura || '';
+    document.getElementById('orcCliente').value = o.cliente || '';
+    document.getElementById('orcWhatsapp').value = o.whatsapp || '';
+    document.getElementById('orcCpf').value = o.cpf || '';
+    document.getElementById('orcValor').value = o.valor || '';
+    document.getElementById('orcAulas').value = o.numero_aulas || '';
+    document.getElementById('orcOrigem').value = o.origem_id || '';
+    document.getElementById('orcVendedor').value = o.vendedor_id || '';
+    document.getElementById('orcFollowup').value = o.followup || '';
+    document.getElementById('orcSituacao').value = o.situacao || 'Aberto';
+    document.getElementById('orcMotivo').value = o.motivo_reprovado_id || '';
+    document.getElementById('orcDataFechamento').value = o.data_fechamento || '';
+  } else {
+    document.getElementById('orcDataAbertura').value = todayISO();
+    document.getElementById('orcCliente').value = '';
+    document.getElementById('orcWhatsapp').value = '';
+    document.getElementById('orcCpf').value = '';
+    document.getElementById('orcValor').value = '';
+    document.getElementById('orcAulas').value = '';
+    document.getElementById('orcOrigem').value = '';
+    document.getElementById('orcVendedor').value = '';
+    document.getElementById('orcFollowup').value = '';
+    document.getElementById('orcSituacao').value = 'Aberto';
+    document.getElementById('orcMotivo').value = '';
+    document.getElementById('orcDataFechamento').value = '';
+  }
+  updateOrcSituacaoUI();
+  openModal('modalOrcamento');
+}
+
+document.getElementById('btnSalvarOrcamento').addEventListener('click', async ()=>{
+  const id = document.getElementById('orcId').value;
+  const cliente = document.getElementById('orcCliente').value.trim();
+  if(!cliente){ showToast('Informe o nome do cliente.', true); return; }
+  const situacao = document.getElementById('orcSituacao').value;
+
+  const payload = {
+    data_abertura: document.getElementById('orcDataAbertura').value || todayISO(),
+    cliente,
+    whatsapp: document.getElementById('orcWhatsapp').value || null,
+    cpf: document.getElementById('orcCpf').value || null,
+    valor: Number(document.getElementById('orcValor').value) || 0,
+    numero_aulas: Number(document.getElementById('orcAulas').value) || 0,
+    origem_id: document.getElementById('orcOrigem').value || null,
+    vendedor_id: document.getElementById('orcVendedor').value || null,
+    followup: document.getElementById('orcFollowup').value || null,
+    situacao,
+    motivo_reprovado_id: situacao === 'Reprovado' ? (document.getElementById('orcMotivo').value || null) : null,
+    data_fechamento: document.getElementById('orcDataFechamento').value || null,
+    updated_at: new Date().toISOString()
+  };
+
+  if(situacao === 'Enviado ao Cliente'){
+    payload.data_envio = todayISO();
+    payload.situacao_cliente = 'Aguardando Cliente';
+  }
+
+  let error;
+  if(id){
+    ({error} = await sb.from('orcamentos').update(payload).eq('id', id));
+  } else {
+    ({error} = await sb.from('orcamentos').insert(payload));
+  }
+  if(error){ showToast('Erro ao salvar: '+error.message, true); return; }
+  showToast('Orçamento salvo com sucesso.');
+  closeModal('modalOrcamento');
+  renderOrcamentos();
+});
+
+async function deleteOrcamento(id){
+  if(!confirm('Tem certeza que deseja excluir este orçamento?')) return;
+  const { error } = await sb.from('orcamentos').delete().eq('id', id);
+  if(error){ showToast('Erro ao excluir: '+error.message, true); return; }
+  showToast('Orçamento excluído.');
+  renderOrcamentos();
+}
+
+/* =====================================================================
+   ENVIADO AO CLIENTE
+   ===================================================================== */
+async function fetchEnviados(){
+  const { data, error } = await sb.from('orcamentos')
+    .select('*, origem:origens(id,nome), vendedor:vendedores(id,nome)')
+    .eq('situacao','Enviado ao Cliente')
+    .order('data_envio',{ascending:false});
+  if(error){ showToast('Erro ao carregar: '+error.message, true); return []; }
+  return data || [];
+}
+
+async function renderEnviados(){
+  state.enviados = await fetchEnviados();
+  drawEnviadosTable();
+}
+
+function drawEnviadosTable(){
+  const search = document.getElementById('envSearch').value.toLowerCase();
+  const fSit = document.getElementById('envFiltroSituacao').value;
+  let rows = state.enviados.filter(o=>{
+    if(fSit && o.situacao_cliente !== fSit) return false;
+    if(search){
+      const blob = `${o.cliente||''} ${o.cpf||''} ${o.whatsapp||''}`.toLowerCase();
+      if(!blob.includes(search)) return false;
+    }
+    return true;
+  });
+  const tbody = document.getElementById('envTableBody');
+  if(rows.length===0){
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="10">Nenhum orçamento enviado ao cliente ainda.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(o=>`
+    <tr>
+      <td>${fmtDate(o.data_envio)}</td>
+      <td>${o.cliente||''}</td>
+      <td>${o.whatsapp||'—'}</td>
+      <td>${fmtMoney(o.valor)}</td>
+      <td>${o.origem?.nome||'—'}</td>
+      <td>${o.vendedor?.nome||'—'}</td>
+      <td>${clienteSitBadge(o.situacao_cliente)}</td>
+      <td>${fmtDate(o.data_aprovacao)}</td>
+      <td>${fmtDate(o.data_fechamento)}</td>
+      <td class="row-actions">
+        <button title="Editar situação" data-editenv="${o.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+  tbody.querySelectorAll('[data-editenv]').forEach(b=> b.addEventListener('click', ()=> openEnviadoModal(b.dataset.editenv)));
+}
+function clienteSitBadge(sit){
+  if(sit==='Aprovado') return '<span class="badge badge-green">Aprovado</span>';
+  if(sit==='Reprovado') return '<span class="badge badge-red">Reprovado</span>';
+  return '<span class="badge badge-yellow">Aguardando Cliente</span>';
+}
+['envSearch','envFiltroSituacao'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', drawEnviadosTable);
+  document.getElementById(id).addEventListener('change', drawEnviadosTable);
+});
+
+function openEnviadoModal(id){
+  const o = state.enviados.find(x=>x.id===id);
+  document.getElementById('envId').value = id;
+  document.getElementById('envClienteNome').value = o.cliente;
+  document.getElementById('envSituacaoCliente').value = o.situacao_cliente || 'Aguardando Cliente';
+  document.getElementById('envDataFechamento').value = o.data_fechamento || '';
+  toggleEnvMotivo();
+  openModal('modalEnviado');
+}
+document.getElementById('envSituacaoCliente').addEventListener('change', toggleEnvMotivo);
+function toggleEnvMotivo(){
+  const sit = document.getElementById('envSituacaoCliente').value;
+  document.getElementById('envMotivoWrap').classList.toggle('hidden', sit !== 'Reprovado');
+}
+
+document.getElementById('btnSalvarEnviado').addEventListener('click', async ()=>{
+  const id = document.getElementById('envId').value;
+  const situacao_cliente = document.getElementById('envSituacaoCliente').value;
+  const payload = {
+    situacao_cliente,
+    data_fechamento: document.getElementById('envDataFechamento').value || null,
+    updated_at: new Date().toISOString()
+  };
+  if(situacao_cliente === 'Aprovado'){
+    payload.data_aprovacao = todayISO();
+  } else {
+    payload.data_aprovacao = null;
+  }
+  if(situacao_cliente === 'Reprovado'){
+    payload.motivo_reprovado_cliente_id = document.getElementById('envMotivo').value || null;
+  }
+  const { error } = await sb.from('orcamentos').update(payload).eq('id', id);
+  if(error){ showToast('Erro ao salvar: '+error.message, true); return; }
+  showToast('Situação atualizada.');
+  closeModal('modalEnviado');
+  renderEnviados();
+});
+
+/* =====================================================================
+   CADASTROS SIMPLES (Vendedores / Origens / Motivos)
+   ===================================================================== */
+const cadastroConfig = {
+  vendedores: { tabela:'vendedores', tbody:'vendedoresTableBody', label:'Vendedor' },
+  origens: { tabela:'origens', tbody:'origensTableBody', label:'Origem' },
+  motivos_reprovacao: { tabela:'motivos_reprovacao', tbody:'motivosTableBody', label:'Motivo' }
+};
+let cadastroAtual = null;
+
+async function renderCadastroSimples(tabela){
+  cadastroAtual = tabela;
+  const cfg = cadastroConfig[tabela];
+  const { data, error } = await sb.from(tabela).select('*').order('nome');
+  if(error){ showToast('Erro ao carregar: '+error.message, true); return; }
+  const tbody = document.getElementById(cfg.tbody);
+  if(!data || data.length===0){
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="3">Nenhum item cadastrado.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.map(item=>`
+    <tr>
+      <td>${item.nome}</td>
+      <td>${item.ativo ? '<span class="badge badge-green">Ativo</span>' : '<span class="badge badge-gray">Inativo</span>'}</td>
+      <td class="row-actions">
+        <button title="Editar" data-editcad="${item.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+        </button>
+        <button title="Excluir" class="danger" data-delcad="${item.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+  tbody.querySelectorAll('[data-editcad]').forEach(b=> b.addEventListener('click', ()=> openCadastroModal(tabela, data.find(d=>d.id===b.dataset.editcad))));
+  tbody.querySelectorAll('[data-delcad]').forEach(b=> b.addEventListener('click', ()=> deleteCadastro(tabela, b.dataset.delcad)));
+}
+
+function openCadastroModal(tabela, item){
+  const cfg = cadastroConfig[tabela];
+  document.getElementById('modalCadastroTitle').textContent = item ? `Editar ${cfg.label}` : `Novo(a) ${cfg.label}`;
+  document.getElementById('cadTabela').value = tabela;
+  document.getElementById('cadId').value = item ? item.id : '';
+  document.getElementById('cadNome').value = item ? item.nome : '';
+  document.getElementById('cadAtivo').checked = item ? item.ativo : true;
+  openModal('modalCadastroSimples');
+}
+document.getElementById('btnNovoVendedor').addEventListener('click', ()=> openCadastroModal('vendedores', null));
+document.getElementById('btnNovaOrigem').addEventListener('click', ()=> openCadastroModal('origens', null));
+document.getElementById('btnNovoMotivo').addEventListener('click', ()=> openCadastroModal('motivos_reprovacao', null));
+
+document.getElementById('btnSalvarCadastro').addEventListener('click', async ()=>{
+  const tabela = document.getElementById('cadTabela').value;
+  const id = document.getElementById('cadId').value;
+  const nome = document.getElementById('cadNome').value.trim();
+  if(!nome){ showToast('Informe o nome.', true); return; }
+  const payload = { nome, ativo: document.getElementById('cadAtivo').checked };
+  let error;
+  if(id){ ({error} = await sb.from(tabela).update(payload).eq('id', id)); }
+  else { ({error} = await sb.from(tabela).insert(payload)); }
+  if(error){ showToast('Erro ao salvar: '+error.message, true); return; }
+  showToast('Salvo com sucesso.');
+  closeModal('modalCadastroSimples');
+  await loadLookups();
+  renderCadastroSimples(tabela);
+});
+
+async function deleteCadastro(tabela, id){
+  if(!confirm('Excluir este item? Se ele já estiver em uso em orçamentos, prefira apenas inativá-lo.')) return;
+  const { error } = await sb.from(tabela).delete().eq('id', id);
+  if(error){ showToast('Erro ao excluir (pode estar em uso): '+error.message, true); return; }
+  showToast('Item excluído.');
+  await loadLookups();
+  renderCadastroSimples(tabela);
+}
+
+/* =====================================================================
+   INDICADOR 6: CONTATO POR ORIGEM
+   ===================================================================== */
+function buildPeriodoToolbar(containerId, key, onChange){
+  const now = new Date();
+  if(!state.indicadorPeriodo[key].ano) state.indicadorPeriodo[key] = { ano: now.getFullYear(), mes: now.getMonth()+1 };
+  const p = state.indicadorPeriodo[key];
+  const anos = [];
+  for(let a = now.getFullYear()-2; a <= now.getFullYear()+1; a++) anos.push(a);
+  const el = document.getElementById(containerId);
+  el.innerHTML = `
+    <select id="${key}_mes">${MESES.map((m,i)=>`<option value="${i+1}" ${p.mes===i+1?'selected':''}>${m}</option>`).join('')}</select>
+    <select id="${key}_ano">${anos.map(a=>`<option value="${a}" ${p.ano===a?'selected':''}>${a}</option>`).join('')}</select>
+    <div class="segmented" id="${key}_modo">
+      <button data-modo="qtd">Quantidade</button>
+      <button data-modo="valor">Valor</button>
+    </div>
+    <div class="spacer"></div>
+  `;
+  const modoWrap = document.getElementById(`${key}_modo`);
+  const currentModo = state.indicadorModo[key] || 'qtd';
+  modoWrap.querySelectorAll('button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.modo === currentModo);
+    b.addEventListener('click', ()=>{
+      state.indicadorModo[key] = b.dataset.modo;
+      modoWrap.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      onChange();
+    });
+  });
+  document.getElementById(`${key}_mes`).addEventListener('change', (e)=>{ p.mes = Number(e.target.value); onChange(); });
+  document.getElementById(`${key}_ano`).addEventListener('change', (e)=>{ p.ano = Number(e.target.value); onChange(); });
+}
+
+async function renderIndicadorContato(){
+  buildPeriodoToolbar('indContatoToolbar', 'contato', renderIndicadorContato);
+  const p = state.indicadorPeriodo.contato;
+  const modo = state.indicadorModo.contato;
+  const origensAtivas = state.origens.filter(o=>o.ativo);
+
+  const head = document.getElementById('indContatoHead');
+  head.innerHTML = `<tr><th>Dia</th><th>Dia da Semana</th>${origensAtivas.map(o=>`<th>${o.nome}</th>`).join('')}<th>Total</th></tr>`;
+
+  const inicio = `${p.ano}-${String(p.mes).padStart(2,'0')}-01`;
+  const fim = `${p.ano}-${String(p.mes).padStart(2,'0')}-${String(daysInMonth(p.ano,p.mes)).padStart(2,'0')}`;
+  const { data, error } = await sb.from('orcamentos')
+    .select('data_abertura, valor, origem_id')
+    .gte('data_abertura', inicio).lte('data_abertura', fim);
+
+  const body = document.getElementById('indContatoBody');
+  if(error){ body.innerHTML = `<tr class="empty-row"><td colspan="${origensAtivas.length+3}">Erro ao carregar: ${error.message}</td></tr>`; return; }
+
+  const dias = daysInMonth(p.ano, p.mes);
+  let rowsHtml = '';
+  for(let d=1; d<=dias; d++){
+    const diaISO = `${p.ano}-${String(p.mes).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const weekend = isWeekend(p.ano,p.mes,d);
+    let total = 0;
+    const cols = origensAtivas.map(o=>{
+      const regs = (data||[]).filter(r=> r.data_abertura===diaISO && r.origem_id===o.id);
+      const val = modo==='qtd' ? regs.length : regs.reduce((s,r)=>s+(Number(r.valor)||0),0);
+      total += val;
+      return `<td>${modo==='qtd' ? val : fmtMoney(val)}</td>`;
+    }).join('');
+    rowsHtml += `<tr class="${weekend?'weekend':''}"><td>${d}</td><td>${DIAS_SEMANA[weekdayOf(p.ano,p.mes,d)]}</td>${cols}<td><strong>${modo==='qtd'?total:fmtMoney(total)}</strong></td></tr>`;
+  }
+  body.innerHTML = rowsHtml;
+}
+
+/* =====================================================================
+   INDICADORES 6.1 / 6.2 / 6.3 (Meta x Real, estrutura comum)
+   Fonte de dados "real" por indicador:
+   - propostas: conta/soma pela data_envio (orçamentos com situação = Enviado ao Cliente)
+   - contatos_realizados: conta/soma pela data_abertura (todo orçamento aberto = 1 contato realizado)
+   - aprovados: conta/soma pela data_aprovacao (situação_cliente = Aprovado)
+   ===================================================================== */
+const indicadorMetaConfig = {
+  propostas: { key:'propostas', toolbar:'indPropostasToolbar', head:'indPropostasHead', body:'indPropostasBody', dataField:'data_envio', filtro: q=>q.eq('situacao','Enviado ao Cliente'), realLabel:'Real Enviado' },
+  contatos_realizados: { key:'contatos_realizados', toolbar:'indContatosRealizadosToolbar', head:'indContatosRealizadosHead', body:'indContatosRealizadosBody', dataField:'data_abertura', filtro: q=>q, realLabel:'Real Contato' },
+  aprovados: { key:'aprovados', toolbar:'indAprovadosToolbar', head:'indAprovadosHead', body:'indAprovadosBody', dataField:'data_aprovacao', filtro: q=>q.eq('situacao_cliente','Aprovado'), realLabel:'Real Aprovado' }
+};
+
+async function renderIndicadorMeta(indicador){
+  const cfg = indicadorMetaConfig[indicador];
+  buildPeriodoToolbar(cfg.toolbar, cfg.key, ()=>renderIndicadorMeta(indicador));
+  const p = state.indicadorPeriodo[cfg.key];
+  const modo = state.indicadorModo[cfg.key];
+  const dias = daysInMonth(p.ano, p.mes);
+
+  const head = document.getElementById(cfg.head);
+  head.innerHTML = `<tr><th>Dia</th><th>Dia da Semana</th><th>Meta Dia</th><th>${cfg.realLabel}</th><th>Meta Acumulada</th><th>Real Acumulado</th><th>% Atingido</th><th>Observação</th></tr>`;
+
+  const inicio = `${p.ano}-${String(p.mes).padStart(2,'0')}-01`;
+  const fim = `${p.ano}-${String(p.mes).padStart(2,'0')}-${String(dias).padStart(2,'0')}`;
+
+  let query = sb.from('orcamentos').select(`${cfg.dataField}, valor`).gte(cfg.dataField, inicio).lte(cfg.dataField, fim);
+  query = cfg.filtro(query);
+  const { data: reais, error } = await query;
+
+  const { data: metas } = await sb.from('metas').select('*').eq('indicador', cfg.key).eq('ano', p.ano).eq('mes', p.mes);
+  const { data: obs } = await sb.from('observacoes_indicador').select('*').eq('indicador', cfg.key).eq('ano', p.ano).eq('mes', p.mes);
+
+  const body = document.getElementById(cfg.body);
+  if(error){ body.innerHTML = `<tr class="empty-row"><td colspan="8">Erro ao carregar: ${error.message}</td></tr>`; return; }
+
+  let metaAcum = 0, realAcum = 0, rowsHtml = '';
+  for(let d=1; d<=dias; d++){
+    const diaISO = `${p.ano}-${String(p.mes).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const weekend = isWeekend(p.ano,p.mes,d);
+    const metaRow = (metas||[]).find(m=>m.dia===d);
+    const metaDia = modo==='qtd' ? (metaRow?.meta_qtd||0) : (metaRow?.meta_valor||0);
+    const regs = (reais||[]).filter(r=> r[cfg.dataField]===diaISO);
+    const realDia = modo==='qtd' ? regs.length : regs.reduce((s,r)=>s+(Number(r.valor)||0),0);
+    metaAcum += Number(metaDia);
+    realAcum += Number(realDia);
+    const pct = metaAcum>0 ? (realAcum/metaAcum*100) : 0;
+    const obsRow = (obs||[]).find(o=>o.dia===d);
+    rowsHtml += `<tr class="${weekend?'weekend':''}">
+      <td>${d}</td><td>${DIAS_SEMANA[weekdayOf(p.ano,p.mes,d)]}</td>
+      <td>${modo==='qtd'?metaDia:fmtMoney(metaDia)}</td>
+      <td>${modo==='qtd'?realDia:fmtMoney(realDia)}</td>
+      <td>${modo==='qtd'?metaAcum:fmtMoney(metaAcum)}</td>
+      <td>${modo==='qtd'?realAcum:fmtMoney(realAcum)}</td>
+      <td>${pct.toFixed(1)}%</td>
+      <td><input class="obs-input" data-obsday="${d}" data-key="${cfg.key}" data-ano="${p.ano}" data-mes="${p.mes}" value="${obsRow?.observacao||''}" placeholder="Observação..." /></td>
+    </tr>`;
+  }
+  body.innerHTML = rowsHtml;
+  body.querySelectorAll('[data-obsday]').forEach(inp=>{
+    inp.addEventListener('change', async ()=>{
+      const payload = { indicador: inp.dataset.key, ano: Number(inp.dataset.ano), mes: Number(inp.dataset.mes), dia: Number(inp.dataset.obsday), observacao: inp.value };
+      const { error } = await sb.from('observacoes_indicador').upsert(payload, { onConflict:'indicador,ano,mes,dia' });
+      if(error) showToast('Erro ao salvar observação: '+error.message, true);
+      else showToast('Observação salva.');
+    });
+  });
+}
+
+/* =====================================================================
+   CADASTRO DE METAS
+   ===================================================================== */
+function renderCadastroMetas(){
+  const now = new Date();
+  const anos = [];
+  for(let a = now.getFullYear()-2; a <= now.getFullYear()+1; a++) anos.push(a);
+  const el = document.getElementById('metasToolbar');
+  const mp = state.metasPeriodo;
+  el.innerHTML = `
+    <select id="metasIndicador">
+      <option value="propostas">Propostas Enviadas</option>
+      <option value="contatos_realizados">Contatos Realizados</option>
+      <option value="aprovados">Aprovados</option>
+    </select>
+    <select id="metasMes">${MESES.map((m,i)=>`<option value="${i+1}" ${mp.mes===i+1?'selected':''}>${m}</option>`).join('')}</select>
+    <select id="metasAno">${anos.map(a=>`<option value="${a}" ${mp.ano===a?'selected':''}>${a}</option>`).join('')}</select>
+    <div class="spacer"></div>
+    <input type="number" id="metasDistribuirQtd" placeholder="Meta mensal (qtd)" style="width:150px;" />
+    <input type="number" id="metasDistribuirValor" placeholder="Meta mensal (R$)" style="width:150px;" />
+    <button class="btn btn-secondary" id="btnDistribuirMetas">Distribuir total (dias úteis)</button>
+  `;
+  document.getElementById('metasIndicador').addEventListener('change', loadMetasTable);
+  document.getElementById('metasMes').addEventListener('change', (e)=>{ mp.mes=Number(e.target.value); loadMetasTable(); });
+  document.getElementById('metasAno').addEventListener('change', (e)=>{ mp.ano=Number(e.target.value); loadMetasTable(); });
+  document.getElementById('btnDistribuirMetas').addEventListener('click', distribuirMetas);
+  loadMetasTable();
+}
+
+async function loadMetasTable(){
+  const indicador = document.getElementById('metasIndicador').value;
+  const p = state.metasPeriodo;
+  const dias = daysInMonth(p.ano, p.mes);
+  const { data: metas } = await sb.from('metas').select('*').eq('indicador', indicador).eq('ano', p.ano).eq('mes', p.mes);
+  const tbody = document.getElementById('metasTableBody');
+  let rowsHtml = '';
+  for(let d=1; d<=dias; d++){
+    const weekend = isWeekend(p.ano,p.mes,d);
+    const m = (metas||[]).find(x=>x.dia===d);
+    rowsHtml += `<tr class="${weekend?'weekend':''}">
+      <td>${d}</td><td>${DIAS_SEMANA[weekdayOf(p.ano,p.mes,d)]}</td>
+      <td><input type="number" class="obs-input" data-metaday="${d}" data-field="qtd" value="${m?.meta_qtd||0}" /></td>
+      <td><input type="number" step="0.01" class="obs-input" data-metaday="${d}" data-field="valor" value="${m?.meta_valor||0}" /></td>
+    </tr>`;
+  }
+  tbody.innerHTML = rowsHtml;
+}
+
+function distribuirMetas(){
+  const p = state.metasPeriodo;
+  const dias = daysInMonth(p.ano, p.mes);
+  let uteis = 0;
+  for(let d=1; d<=dias; d++){ if(!isWeekend(p.ano,p.mes,d)) uteis++; }
+  const totalQtd = Number(document.getElementById('metasDistribuirQtd').value) || 0;
+  const totalValor = Number(document.getElementById('metasDistribuirValor').value) || 0;
+  const porDiaQtd = uteis>0 ? Math.round((totalQtd/uteis)*100)/100 : 0;
+  const porDiaValor = uteis>0 ? Math.round((totalValor/uteis)*100)/100 : 0;
+  document.querySelectorAll('#metasTableBody tr').forEach((tr,i)=>{
+    const d = i+1;
+    const weekend = isWeekend(p.ano,p.mes,d);
+    const qtdInput = tr.querySelector('[data-field="qtd"]');
+    const valorInput = tr.querySelector('[data-field="valor"]');
+    qtdInput.value = weekend ? 0 : porDiaQtd;
+    valorInput.value = weekend ? 0 : porDiaValor;
+  });
+  showToast('Metas distribuídas nos dias úteis. Clique em "Salvar Metas" para confirmar.');
+}
+
+document.getElementById('btnSalvarMetas').addEventListener('click', async ()=>{
+  const indicador = document.getElementById('metasIndicador').value;
+  const p = state.metasPeriodo;
+  const rows = [];
+  document.querySelectorAll('#metasTableBody tr').forEach((tr,i)=>{
+    const d = i+1;
+    const qtd = Number(tr.querySelector('[data-field="qtd"]').value) || 0;
+    const valor = Number(tr.querySelector('[data-field="valor"]').value) || 0;
+    rows.push({ indicador, ano:p.ano, mes:p.mes, dia:d, meta_qtd:qtd, meta_valor:valor });
+  });
+  const { error } = await sb.from('metas').upsert(rows, { onConflict:'indicador,ano,mes,dia' });
+  if(error){ showToast('Erro ao salvar metas: '+error.message, true); return; }
+  showToast('Metas salvas com sucesso.');
+});
+
+</script>
+</body>
+</html>
