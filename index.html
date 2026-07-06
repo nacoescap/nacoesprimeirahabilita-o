@@ -320,10 +320,17 @@ tbody tr:last-child td{border-bottom:none;}
 .perm-row input{width:16px;height:16px;accent-color:var(--blue-600);flex-shrink:0;}
 .perm-row label{font-size:13px;color:var(--text);cursor:pointer;}
 
-.gauge-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
-.gauge-box{text-align:center;position:relative;}
-.gauge-label{font-size:12.5px;color:var(--text-muted);font-weight:600;margin-top:-6px;}
-@media (max-width:700px){ .gauge-grid{grid-template-columns:1fr;} }
+.gauge-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;}
+.gauge-card{background:var(--surface);border-radius:10px;box-shadow:var(--shadow);border-top:3px solid var(--blue-600);padding:10px 12px 12px;text-align:center;}
+.gauge-title{font-size:10.5px;font-weight:700;color:var(--text-muted);letter-spacing:.3px;text-transform:uppercase;margin-bottom:2px;}
+.gauge-canvas-wrap{height:72px;position:relative;}
+.gauge-meta{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.mini-chart-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.mini-chart-card{background:var(--surface);border-radius:10px;box-shadow:var(--shadow);padding:10px 12px;}
+.mini-chart-title{font-size:10.5px;font-weight:700;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.2px;}
+.mini-chart-canvas-wrap{height:100px;position:relative;}
+@media (max-width:900px){ .mini-chart-grid{grid-template-columns:repeat(2,1fr);} }
+@media (max-width:700px){ .gauge-grid{grid-template-columns:1fr;} .mini-chart-grid{grid-template-columns:1fr;} }
 
 /* Indicator legend */
 .legend-row{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-muted);margin-bottom:12px;}
@@ -519,32 +526,29 @@ tbody tr:last-child td{border-bottom:none;}
         <div class="toolbar" id="dashboardToolbar"></div>
         <div class="stat-grid" id="dashboardStats"></div>
 
-        <div class="card" style="margin-bottom:16px; padding:16px 20px;">
-          <h3 class="section-title" style="margin-bottom:10px;">Indicadores do Período</h3>
-          <div class="gauge-grid">
-            <div class="gauge-box"><canvas id="gaugePropostas" height="110"></canvas><div class="gauge-label">Propostas Enviadas</div></div>
-            <div class="gauge-box"><canvas id="gaugeContatos" height="110"></canvas><div class="gauge-label">Contatos Realizados</div></div>
-            <div class="gauge-box"><canvas id="gaugeAprovados" height="110"></canvas><div class="gauge-label">Aprovados</div></div>
+        <div class="gauge-grid">
+          <div class="gauge-card">
+            <div class="gauge-title">Propostas Enviadas</div>
+            <div class="gauge-canvas-wrap"><canvas id="gaugePropostas"></canvas></div>
+            <div class="gauge-meta" id="gaugePropostasMeta">—</div>
+          </div>
+          <div class="gauge-card">
+            <div class="gauge-title">Contatos Realizados</div>
+            <div class="gauge-canvas-wrap"><canvas id="gaugeContatos"></canvas></div>
+            <div class="gauge-meta" id="gaugeContatosMeta">—</div>
+          </div>
+          <div class="gauge-card">
+            <div class="gauge-title">Aprovados</div>
+            <div class="gauge-canvas-wrap"><canvas id="gaugeAprovados"></canvas></div>
+            <div class="gauge-meta" id="gaugeAprovadosMeta">—</div>
           </div>
         </div>
 
-        <div class="card" style="margin-bottom:16px; padding:16px 20px;">
-          <h3 class="section-title" style="margin-bottom:8px;">Orçamentos x Aprovados</h3>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-            <div><p class="small muted" style="margin:0 0 4px;">Quantidade</p><canvas id="chartQtd" height="110"></canvas></div>
-            <div><p class="small muted" style="margin:0 0 4px;">Valor (R$)</p><canvas id="chartValor" height="110"></canvas></div>
-          </div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-          <div class="card" style="padding:16px 20px;">
-            <h3 class="section-title" style="margin-bottom:8px;">Orçamentos por Origem</h3>
-            <canvas id="chartOrigem" height="130"></canvas>
-          </div>
-          <div class="card" style="padding:16px 20px;">
-            <h3 class="section-title" style="margin-bottom:8px;">Aprovados por Mês (Jan–Dez)</h3>
-            <canvas id="chartAnual" height="130"></canvas>
-          </div>
+        <div class="mini-chart-grid">
+          <div class="mini-chart-card"><div class="mini-chart-title" id="miniQtdTitle">Qtd: Orç. x Aprov.</div><div class="mini-chart-canvas-wrap"><canvas id="chartQtd"></canvas></div></div>
+          <div class="mini-chart-card"><div class="mini-chart-title" id="miniValorTitle">Valor: Orç. x Aprov.</div><div class="mini-chart-canvas-wrap"><canvas id="chartValor"></canvas></div></div>
+          <div class="mini-chart-card"><div class="mini-chart-title">Por Origem</div><div class="mini-chart-canvas-wrap"><canvas id="chartOrigem"></canvas></div></div>
+          <div class="mini-chart-card"><div class="mini-chart-title">Aprovados (Ano)</div><div class="mini-chart-canvas-wrap"><canvas id="chartAnual"></canvas></div></div>
         </div>
       </section>
 
@@ -606,7 +610,7 @@ tbody tr:last-child td{border-bottom:none;}
           <table>
             <thead><tr>
               <th>Aprovação</th><th>Cliente</th><th>WhatsApp</th><th>Valor</th><th>Origem</th>
-              <th>Vendedor</th><th>Situação</th><th>Follow-up</th><th>Fechamento</th><th>Ações</th>
+              <th>Vendedor</th><th>Situação</th><th>Etapa Atual</th><th>Follow-up</th><th>Fechamento</th><th>Ações</th>
             </tr></thead>
             <tbody id="aprTableBody"></tbody>
           </table>
@@ -1588,16 +1592,20 @@ async function renderDashboard(){
   destroyChart('qtd');
   state.charts.qtd = new Chart(document.getElementById('chartQtd'), {
     type: 'bar',
-    data: { labels: ['Orçamentos', 'Aprovados'], datasets: [{ data: [totalQtd, aprovQtd], backgroundColor: ['#1477a8','#1f9d55'], borderRadius:6 }] },
-    options: { responsive:true, plugins:{ legend:{ display:false }, title:{ display:true, text:`Conversão: ${pctQtd.toFixed(1)}%`, color:'#64748b', font:{size:12} } }, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } } }
+    data: { labels: ['Orçamentos', 'Aprovados'], datasets: [{ data: [totalQtd, aprovQtd], backgroundColor: ['#1477a8','#1f9d55'], borderRadius:5 }] },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ precision:0, font:{size:10} } }, x:{ ticks:{ font:{size:10} } } } }
   });
+  const miniQtdTitle = document.getElementById('miniQtdTitle');
+  if(miniQtdTitle) miniQtdTitle.textContent = `Qtd: Orç. x Aprov. (${pctQtd.toFixed(0)}%)`;
 
   destroyChart('valor');
   state.charts.valor = new Chart(document.getElementById('chartValor'), {
     type: 'bar',
-    data: { labels: ['Orçamentos', 'Aprovados'], datasets: [{ data: [totalValor, aprovValor], backgroundColor: ['#1477a8','#1f9d55'], borderRadius:6 }] },
-    options: { responsive:true, plugins:{ legend:{ display:false }, title:{ display:true, text:`Conversão em valor: ${pctValor.toFixed(1)}%`, color:'#64748b', font:{size:12} } }, scales:{ y:{ beginAtZero:true, ticks:{ callback:(v)=>fmtMoney(v) } } } }
+    data: { labels: ['Orçamentos', 'Aprovados'], datasets: [{ data: [totalValor, aprovValor], backgroundColor: ['#1477a8','#1f9d55'], borderRadius:5 }] },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ callback:(v)=>fmtMoney(v), font:{size:9} } }, x:{ ticks:{ font:{size:10} } } } }
   });
+  const miniValorTitle = document.getElementById('miniValorTitle');
+  if(miniValorTitle) miniValorTitle.textContent = `Valor: Orç. x Aprov. (${pctValor.toFixed(0)}%)`;
 
   const origensAtivas = state.origens.filter(o=>o.ativo);
   const origemCounts = origensAtivas.map(o => (orcamentosMes||[]).filter(r=>r.origem_id===o.id).length);
@@ -1605,7 +1613,7 @@ async function renderDashboard(){
   state.charts.origem = new Chart(document.getElementById('chartOrigem'), {
     type: 'doughnut',
     data: { labels: origensAtivas.map(o=>o.nome), datasets: [{ data: origemCounts, backgroundColor: CHART_PALETTE }] },
-    options: { responsive:true, plugins:{ legend:{ position:'bottom', labels:{ boxWidth:12, font:{size:11} } } } }
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ boxWidth:8, font:{size:9.5}, padding:6 } } } }
   });
 
   const monthlyApproved = Array.from({length:12}, (_,i)=>{
@@ -1615,8 +1623,8 @@ async function renderDashboard(){
   destroyChart('anual');
   state.charts.anual = new Chart(document.getElementById('chartAnual'), {
     type: 'bar',
-    data: { labels: MESES.map(m=>m.slice(0,3)), datasets: [{ label:'Aprovados', data: monthlyApproved, backgroundColor:'#1f9d55', borderRadius:5 }] },
-    options: { responsive:true, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } } }
+    data: { labels: MESES.map(m=>m.slice(0,3)), datasets: [{ label:'Aprovados', data: monthlyApproved, backgroundColor:'#1f9d55', borderRadius:4 }] },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ precision:0, font:{size:9} } }, x:{ ticks:{ font:{size:9} } } } }
   });
 
   const [gaugeProp, gaugeCont, gaugeAprov] = await Promise.all([
@@ -1624,9 +1632,9 @@ async function renderDashboard(){
     computeGaugeData('contatos_realizados', 'data_abertura', q=>q),
     computeGaugeData('aprovados', 'data_aprovacao', q=>q.eq('situacao_cliente','Aprovado'))
   ]);
-  renderGauge('gaugePropostas', 'gaugeProp', gaugeProp.pct, gaugeProp.real, gaugeProp.meta);
-  renderGauge('gaugeContatos', 'gaugeCont', gaugeCont.pct, gaugeCont.real, gaugeCont.meta);
-  renderGauge('gaugeAprovados', 'gaugeAprov', gaugeAprov.pct, gaugeAprov.real, gaugeAprov.meta);
+  renderGauge('gaugePropostas', 'gaugeProp', gaugeProp.pct, gaugeProp.real, gaugeProp.meta, 'gaugePropostasMeta');
+  renderGauge('gaugeContatos', 'gaugeCont', gaugeCont.pct, gaugeCont.real, gaugeCont.meta, 'gaugeContatosMeta');
+  renderGauge('gaugeAprovados', 'gaugeAprov', gaugeAprov.pct, gaugeAprov.real, gaugeAprov.meta, 'gaugeAprovadosMeta');
 }
 
 async function computeGaugeData(indicador, dataField, filtroFn){
@@ -1645,7 +1653,7 @@ async function computeGaugeData(indicador, dataField, filtroFn){
   return { real, meta, pct };
 }
 
-function renderGauge(canvasId, chartKey, pct, real, meta){
+function renderGauge(canvasId, chartKey, pct, real, meta, metaElId){
   destroyChart(chartKey);
   const clamped = Math.max(0, Math.min(pct, 100));
   const color = pct >= 100 ? '#1f9d55' : (pct >= 60 ? '#1477a8' : (pct >= 30 ? '#e08e0b' : '#d64545'));
@@ -1653,7 +1661,8 @@ function renderGauge(canvasId, chartKey, pct, real, meta){
     type: 'doughnut',
     data: { datasets: [{ data: [clamped, 100-clamped], backgroundColor: [color, '#eef1f4'], borderWidth:0 }] },
     options: {
-      responsive:true, circumference:180, rotation:270, cutout:'72%',
+      responsive:true, maintainAspectRatio:false,
+      circumference:180, rotation:270, cutout:'72%',
       plugins:{ legend:{ display:false }, tooltip:{ enabled:false } }
     },
     plugins: [{
@@ -1662,19 +1671,23 @@ function renderGauge(canvasId, chartKey, pct, real, meta){
         const { ctx, chartArea } = chart;
         if(!chartArea) return;
         const cx = (chartArea.left + chartArea.right) / 2;
-        const cy = chartArea.bottom - 4;
+        const cy = chartArea.bottom - 2;
         ctx.save();
         ctx.textAlign = 'center';
         ctx.fillStyle = '#1f2937';
-        ctx.font = "700 17px Poppins, sans-serif";
-        ctx.fillText(Math.round(pct) + '%', cx, cy - 12);
-        ctx.font = "400 10.5px Inter, sans-serif";
-        ctx.fillStyle = '#64748b';
-        ctx.fillText(`${real} / ${meta}`, cx, cy + 4);
+        ctx.font = "700 15px Poppins, sans-serif";
+        ctx.fillText(Math.round(pct) + '%', cx, cy - 2);
         ctx.restore();
       }
     }]
   });
+  const metaEl = document.getElementById(metaElId);
+  if(metaEl){
+    const statusHtml = pct >= 100
+      ? '<span class="badge badge-green">OK</span>'
+      : '<span class="badge badge-red">Abaixo da meta</span>';
+    metaEl.innerHTML = `${real} / ${meta} ${statusHtml}`;
+  }
 }
 
 /* =====================================================================
@@ -2253,7 +2266,7 @@ function drawAprovadosTable(){
   });
   const tbody = document.getElementById('aprTableBody');
   if(rows.length===0){
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="10">Nenhum orçamento aprovado ainda.</td></tr>`;
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="11">Nenhum orçamento aprovado ainda.</td></tr>`;
     return;
   }
   tbody.innerHTML = rows.map(o=>`
@@ -2265,6 +2278,7 @@ function drawAprovadosTable(){
       <td>${o.origem?.nome||'—'}</td>
       <td>${o.vendedor?.nome||'—'}</td>
       <td>${situacaoClienteSelectHtml(o)}</td>
+      <td>${etapaCell(o)}</td>
       <td>${firstFollowupCell(o)}</td>
       <td>${fmtDate(o.data_fechamento)}</td>
       <td class="row-actions">
@@ -2274,6 +2288,7 @@ function drawAprovadosTable(){
         <button title="Editar" data-editenv="${o.id}">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
         </button>
+        ${o.etapa ? '' : `<button class="btn btn-sm btn-yellow" data-enviar-exame="${o.id}">Enviar para Exames</button>`}
       </td>
     </tr>
   `).join('');
@@ -2282,6 +2297,19 @@ function drawAprovadosTable(){
   tbody.querySelectorAll('[data-situacao-cliente-select]').forEach(sel=>{
     sel.addEventListener('change', (e)=> quickChangeSituacaoCliente(sel.dataset.situacaoClienteSelect, e.target.value));
   });
+  tbody.querySelectorAll('[data-enviar-exame]').forEach(b=> b.addEventListener('click', ()=> enviarParaExames(b.dataset.enviarExame)));
+}
+const ETAPA_LABELS = {
+  exames:'Exames', conferencia:'Conferência', reprovados:'Alunos Reprovados', cobranca:'Cobrança',
+  aulas:'Agend. Aulas', agendados:'Alunos Agendados', teste_pratico:'Agend. Teste', resultado_teste:'Resultado Teste',
+  aprovado_final:'Concluído'
+};
+function etapaCell(o){
+  if(!o.etapa) return '<span class="badge badge-gray">Não iniciado</span>';
+  return `<span class="badge badge-blue">${ETAPA_LABELS[o.etapa]||o.etapa}</span>`;
+}
+async function enviarParaExames(id){
+  await updatePipeline(id, { etapa:'exames', situacao_etapa:'Em Andamento' }, [renderAprovados, renderExames]);
 }
 ['aprSearch','aprFiltroOrigem'].forEach(id=>{
   document.getElementById(id).addEventListener('input', drawAprovadosTable);
@@ -2759,7 +2787,11 @@ document.getElementById('btnSalvarCadastro').addEventListener('click', async ()=
   let error;
   if(id){ ({error} = await sb.from(tabela).update(payload).eq('id', id)); }
   else { ({error} = await sb.from(tabela).insert(payload)); }
-  if(error){ showToast('Erro ao salvar: '+error.message, true); return; }
+  if(error){
+    const msg = (error.message||'').toLowerCase().includes('duplicate') ? 'Já existe um item com esse nome.' : error.message;
+    showToast('Erro ao salvar: '+msg, true);
+    return;
+  }
   showToast('Salvo com sucesso.');
   closeModal('modalCadastroSimples');
   await loadLookups();
