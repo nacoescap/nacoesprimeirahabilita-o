@@ -282,6 +282,25 @@ tbody tr:last-child td{border-bottom:none;}
 }
 .select-with-btn button:hover{border-color:var(--blue-600);}
 
+.followup-list{margin-bottom:10px;}
+.followup-row{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  margin-bottom:8px;background:#fafcfd;
+}
+.followup-badge{
+  flex-shrink:0;background:var(--blue-700);color:#fff;font-size:11.5px;font-weight:700;
+  padding:4px 9px;border-radius:999px;white-space:nowrap;
+}
+.followup-row input[type="date"]{flex-shrink:0;width:140px;padding:7px 8px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;}
+.followup-row input[type="text"]{flex:1;padding:7px 9px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;}
+.followup-remove{
+  flex-shrink:0;border:none;background:var(--danger-bg);color:var(--danger);border-radius:7px;
+  width:26px;height:26px;cursor:pointer;font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center;
+}
+.followup-remove:hover{filter:brightness(0.96);}
+.followup-empty{font-size:12.5px;color:var(--text-muted);padding:6px 2px 10px;}
+
 /* Indicator legend */
 .legend-row{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-muted);margin-bottom:12px;}
 .legend-swatch{width:12px;height:12px;border-radius:3px;background:var(--weekend-bg);border:1px solid #f0c9c9;}
@@ -577,7 +596,11 @@ tbody tr:last-child td{border-bottom:none;}
             </button>
           </div>
         </div>
-        <div class="field full"><label>Follow-up</label><textarea id="orcFollowup" rows="2" placeholder="Observações de acompanhamento..."></textarea></div>
+        <div class="field full">
+          <label>Follow-up (Ligações)</label>
+          <div id="orcFollowupList" class="followup-list"></div>
+          <button type="button" class="btn btn-secondary btn-sm" id="btnAddLigacao">+ Registrar Ligação</button>
+        </div>
         <div class="field">
           <label>Situação</label>
           <select id="orcSituacao">
@@ -938,7 +961,7 @@ async function renderDashboard(){
    ===================================================================== */
 async function fetchOrcamentos(){
   const { data, error } = await sb.from('orcamentos')
-    .select('*, origem:origens(id,nome), vendedor:vendedores(id,nome), motivo:motivos_reprovacao(id,nome)')
+    .select('*, origem:origens(id,nome), vendedor:vendedores(id,nome), motivo:motivos_reprovacao!motivo_reprovado_id(id,nome)')
     .neq('situacao','Enviado ao Cliente')
     .order('data_abertura',{ascending:false});
   if(error){ showToast('Erro ao carregar orçamentos: '+error.message, true); return []; }
@@ -1035,7 +1058,7 @@ function openOrcamentoModal(id){
     document.getElementById('orcAulas').value = o.numero_aulas || '';
     document.getElementById('orcOrigem').value = o.origem_id || '';
     document.getElementById('orcVendedor').value = o.vendedor_id || '';
-    document.getElementById('orcFollowup').value = o.followup || '';
+    currentFollowups = parseFollowups(o.followup);
     document.getElementById('orcSituacao').value = o.situacao || 'Aberto';
     document.getElementById('orcMotivo').value = o.motivo_reprovado_id || '';
     document.getElementById('orcDataFechamento').value = o.data_fechamento || '';
@@ -1048,14 +1071,61 @@ function openOrcamentoModal(id){
     document.getElementById('orcAulas').value = '';
     document.getElementById('orcOrigem').value = '';
     document.getElementById('orcVendedor').value = '';
-    document.getElementById('orcFollowup').value = '';
+    currentFollowups = [];
     document.getElementById('orcSituacao').value = 'Aberto';
     document.getElementById('orcMotivo').value = '';
     document.getElementById('orcDataFechamento').value = '';
   }
+  renderFollowupList();
   updateOrcSituacaoUI();
   openModal('modalOrcamento');
 }
+
+/* ---------- Follow-up (ligações) ---------- */
+let currentFollowups = [];
+
+function parseFollowups(raw){
+  if(!raw) return [];
+  try{
+    const parsed = JSON.parse(raw);
+    if(Array.isArray(parsed)) return parsed;
+  }catch(e){
+    // Registro antigo (texto livre) - preserva como a 1ª ligação
+    return [{ data: todayISO(), observacao: raw }];
+  }
+  return [];
+}
+
+function renderFollowupList(){
+  const wrap = document.getElementById('orcFollowupList');
+  if(currentFollowups.length === 0){
+    wrap.innerHTML = `<div class="followup-empty">Nenhuma ligação registrada ainda.</div>`;
+    return;
+  }
+  wrap.innerHTML = currentFollowups.map((f,i)=>`
+    <div class="followup-row" data-idx="${i}">
+      <span class="followup-badge">${i+1}ª Ligação</span>
+      <input type="date" class="followup-date" value="${f.data || todayISO()}" />
+      <input type="text" class="followup-note" placeholder="O que foi conversado..." value="${(f.observacao||'').replace(/"/g,'&quot;')}" />
+      <button type="button" class="followup-remove" title="Remover ligação">×</button>
+    </div>
+  `).join('');
+
+  wrap.querySelectorAll('.followup-row').forEach(row=>{
+    const idx = Number(row.dataset.idx);
+    row.querySelector('.followup-date').addEventListener('change', (e)=>{ currentFollowups[idx].data = e.target.value; });
+    row.querySelector('.followup-note').addEventListener('input', (e)=>{ currentFollowups[idx].observacao = e.target.value; });
+    row.querySelector('.followup-remove').addEventListener('click', ()=>{
+      currentFollowups.splice(idx,1);
+      renderFollowupList();
+    });
+  });
+}
+
+document.getElementById('btnAddLigacao').addEventListener('click', ()=>{
+  currentFollowups.push({ data: todayISO(), observacao: '' });
+  renderFollowupList();
+});
 
 document.getElementById('btnSalvarOrcamento').addEventListener('click', async ()=>{
   const id = document.getElementById('orcId').value;
@@ -1072,7 +1142,7 @@ document.getElementById('btnSalvarOrcamento').addEventListener('click', async ()
     numero_aulas: Number(document.getElementById('orcAulas').value) || 0,
     origem_id: document.getElementById('orcOrigem').value || null,
     vendedor_id: document.getElementById('orcVendedor').value || null,
-    followup: document.getElementById('orcFollowup').value || null,
+    followup: currentFollowups.length ? JSON.stringify(currentFollowups) : null,
     situacao,
     motivo_reprovado_id: situacao === 'Reprovado' ? (document.getElementById('orcMotivo').value || null) : null,
     data_fechamento: document.getElementById('orcDataFechamento').value || null,
