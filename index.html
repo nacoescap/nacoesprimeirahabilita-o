@@ -310,6 +310,14 @@ tbody tr:last-child td{border-bottom:none;}
 .inline-select.sit-reprovado{background:var(--danger-bg);color:var(--danger);border-color:#f3d3d3;}
 .inline-select.sit-enviado{background:#fdf1cd;color:#9a6c00;border-color:#f5e3ad;}
 
+.perm-row{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  margin-bottom:6px;background:#fafcfd;
+}
+.perm-row input{width:16px;height:16px;accent-color:var(--blue-600);flex-shrink:0;}
+.perm-row label{font-size:13px;color:var(--text);cursor:pointer;}
+
 /* Indicator legend */
 .legend-row{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-muted);margin-bottom:12px;}
 .legend-swatch{width:12px;height:12px;border-radius:3px;background:var(--weekend-bg);border:1px solid #f0c9c9;}
@@ -431,6 +439,10 @@ tbody tr:last-child td{border-bottom:none;}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
           <span>Metas</span>
         </div>
+        <div class="nav-item" data-view="cad-usuarios">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span>Usuários e Permissões</span>
+        </div>
       </div>
     </nav>
     <div class="sidebar-footer">
@@ -479,7 +491,7 @@ tbody tr:last-child td{border-bottom:none;}
           <table>
             <thead><tr>
               <th>Abertura</th><th>Cliente</th><th>WhatsApp</th><th>CPF</th><th>Valor</th>
-              <th>Aulas</th><th>Origem</th><th>Vendedor</th><th>Situação</th><th>Fechamento</th><th>Ações</th>
+              <th>Aulas</th><th>Origem</th><th>Vendedor</th><th>Situação</th><th>Follow-up</th><th>Ações</th>
             </tr></thead>
             <tbody id="orcTableBody"></tbody>
           </table>
@@ -561,6 +573,15 @@ tbody tr:last-child td{border-bottom:none;}
         <p class="helper-text">Defina a meta de quantidade e/ou valor para cada dia do mês selecionado. Use "Distribuir total" para preencher automaticamente os dias úteis a partir de uma meta mensal.</p>
         <div class="table-wrap"><table><thead><tr><th>Dia</th><th>Dia da Semana</th><th>Meta Qtd.</th><th>Meta Valor (R$)</th></tr></thead><tbody id="metasTableBody"></tbody></table></div>
         <div style="margin-top:14px;"><button class="btn btn-primary" id="btnSalvarMetas">Salvar Metas</button></div>
+      </section>
+
+      <!-- ============ CADASTRO: USUÁRIOS E PERMISSÕES ============ -->
+      <section class="view" id="view-cad-usuarios">
+        <p class="helper-text">Crie logins adicionais para outras pessoas acessarem o sistema, escolhendo quais telas cada um pode ver. O login "admin" é fixo e sempre tem acesso total.</p>
+        <div class="toolbar"><div class="spacer"></div><button class="btn btn-yellow" id="btnNovoUsuario">+ Novo Usuário</button></div>
+        <div class="table-wrap">
+          <table><thead><tr><th>Nome</th><th>Usuário</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usuariosTableBody"></tbody></table>
+        </div>
       </section>
 
     </main>
@@ -742,6 +763,47 @@ tbody tr:last-child td{border-bottom:none;}
   </div>
 </div>
 
+<!-- ============================================================= -->
+<!-- MODAL: USUÁRIO E PERMISSÕES                                    -->
+<!-- ============================================================= -->
+<div class="modal-overlay hidden" id="modalUsuario">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <h3 id="modalUsuarioTitle">Novo Usuário</h3>
+      <button class="modal-close" data-close="modalUsuario">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="usrId" />
+      <div class="form-grid">
+        <div class="field"><label>Nome</label><input type="text" id="usrNome" placeholder="Nome completo" /></div>
+        <div class="field"><label>Usuário (login)</label><input type="text" id="usrUsuario" placeholder="ex: joel" /></div>
+        <div class="field">
+          <label>Senha</label>
+          <div class="field-with-icon">
+            <input type="password" id="usrSenha" autocomplete="new-password" placeholder="Deixe em branco para manter" />
+            <button type="button" class="icon-btn" id="toggleUsrSenha" title="Mostrar/ocultar senha">
+              <svg id="usrEyeIcon" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="field"><label>Status</label>
+          <div class="checkbox-row" style="margin-top:10px;"><input type="checkbox" id="usrAtivo" checked /><label for="usrAtivo">Ativo</label></div>
+        </div>
+      </div>
+      <div class="field full">
+        <label>Telas Permitidas</label>
+        <div id="usrPermissoesList" class="followup-list"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-close="modalUsuario">Cancelar</button>
+      <button class="btn btn-primary" id="btnSalvarUsuario">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* =====================================================================
    CONFIGURAÇÃO DO SUPABASE
@@ -760,6 +822,25 @@ try{
 const AUTH_USER = 'admin';
 const AUTH_PASS = 'C@pnac_2026';
 
+/* Telas controláveis por permissão (usadas no cadastro de usuários) */
+const VIEW_LIST = [
+  { key:'orcamentos', label:'Orçamentos' },
+  { key:'enviados', label:'Enviado ao Cliente' },
+  { key:'ind-contato', label:'Indicador: Contatos por Origem' },
+  { key:'ind-propostas', label:'Indicador: Propostas Enviadas' },
+  { key:'ind-contatos-realizados', label:'Indicador: Contatos Realizados' },
+  { key:'ind-aprovados', label:'Indicador: Aprovados' },
+  { key:'cad-vendedores', label:'Cadastro: Vendedores' },
+  { key:'cad-origens', label:'Cadastro: Origens' },
+  { key:'cad-motivos', label:'Cadastro: Motivos de Reprovação' },
+  { key:'cad-metas', label:'Cadastro: Metas' }
+];
+function fullPermissoes(){
+  const p = {};
+  VIEW_LIST.forEach(v=> p[v.key] = true);
+  return p;
+}
+
 /* =====================================================================
    ESTADO GLOBAL
    ===================================================================== */
@@ -770,6 +851,7 @@ const state = {
   orcamentos: [],
   enviados: [],
   currentView: 'dashboard',
+  currentUser: null, // { usuario, nome, isSuperAdmin, permissoes }
   indicadorModo: { contato: 'qtd', propostas: 'qtd', contatosRealizados: 'qtd', aprovados: 'qtd' },
   indicadorPeriodo: { contato: {}, propostas: {}, contatosRealizados: {}, aprovados: {} },
   metasPeriodo: { ano: new Date().getFullYear(), mes: new Date().getMonth() + 1 }
@@ -829,6 +911,15 @@ function showToast(msg, isError){
 function openModal(id){ document.getElementById(id).classList.remove('hidden'); }
 function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
 
+async function sha256Hex(text){
+  if(!window.crypto || !window.crypto.subtle){
+    throw new Error('Este navegador não oferece suporte a criptografia (crypto.subtle). Tente atualizar o navegador ou acessar via HTTPS.');
+  }
+  const enc = new TextEncoder().encode(text);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
 /* =====================================================================
    LOGIN
    ===================================================================== */
@@ -874,13 +965,68 @@ loginForm.addEventListener('submit', (e)=>{
   doLogin(false);
 });
 
-function doLogin(fromSession){
+async function doLogin(fromSession){
+  if(fromSession){
+    let savedUser = null;
+    try{ savedUser = JSON.parse(safeStorage('getItem','nacoes_current_user') || 'null'); }catch(e){}
+    if(!savedUser){ return; }
+    if(savedUser.usuario === AUTH_USER){
+      state.currentUser = { usuario: AUTH_USER, nome:'Administrador', isSuperAdmin:true, permissoes: fullPermissoes() };
+      proceedToApp();
+      return;
+    }
+    const ok = await loadUserPermissions(savedUser.usuario);
+    if(!ok){
+      safeStorage('removeItem','nacoes_session');
+      safeStorage('removeItem','nacoes_current_user');
+      return;
+    }
+    proceedToApp();
+    return;
+  }
+
   const u = loginUser.value.trim();
   const p = loginPass.value;
-  if(!fromSession && (u !== AUTH_USER || p !== AUTH_PASS)){
+
+  if(u === AUTH_USER && p === AUTH_PASS){
+    state.currentUser = { usuario: AUTH_USER, nome:'Administrador', isSuperAdmin:true, permissoes: fullPermissoes() };
+    finalizeLogin(u,p);
+    return;
+  }
+
+  if(!sb){
+    loginError.textContent = 'Sem conexão com o banco de dados. Verifique sua internet.';
+    return;
+  }
+  const { data, error } = await sb.from('usuarios').select('*').eq('usuario', u).eq('ativo', true).maybeSingle();
+  if(error || !data){
     loginError.textContent = 'Usuário ou senha inválidos.';
     return;
   }
+  let hash;
+  try{
+    hash = await sha256Hex(p);
+  }catch(err){
+    loginError.textContent = err.message;
+    return;
+  }
+  if(hash !== data.senha_hash){
+    loginError.textContent = 'Usuário ou senha inválidos.';
+    return;
+  }
+  state.currentUser = { usuario: data.usuario, nome: data.nome, isSuperAdmin:false, permissoes: data.permissoes || {} };
+  finalizeLogin(u,p);
+}
+
+async function loadUserPermissions(usuario){
+  if(!sb) return false;
+  const { data, error } = await sb.from('usuarios').select('*').eq('usuario', usuario).eq('ativo', true).maybeSingle();
+  if(error || !data) return false;
+  state.currentUser = { usuario: data.usuario, nome: data.nome, isSuperAdmin:false, permissoes: data.permissoes || {} };
+  return true;
+}
+
+function finalizeLogin(u,p){
   loginError.textContent = '';
   if(rememberMe.checked){
     safeStorage('setItem','nacoes_saved_login', JSON.stringify({u,p}));
@@ -888,13 +1034,41 @@ function doLogin(fromSession){
     safeStorage('removeItem','nacoes_saved_login');
   }
   safeStorage('setItem','nacoes_session','active');
+  safeStorage('setItem','nacoes_current_user', JSON.stringify({usuario:u}));
+  proceedToApp();
+}
+
+function proceedToApp(){
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('appShell').classList.remove('hidden');
+  applyPermissionsToUI();
   initApp();
+}
+
+function canAccessView(view){
+  if(view === 'dashboard') return true;
+  if(!state.currentUser) return false;
+  if(state.currentUser.isSuperAdmin) return true;
+  if(view === 'cad-usuarios') return false;
+  return state.currentUser.permissoes && state.currentUser.permissoes[view] === true;
+}
+
+function applyPermissionsToUI(){
+  const isSuper = !!(state.currentUser && state.currentUser.isSuperAdmin);
+  document.querySelectorAll('.nav-item[data-view]').forEach(item=>{
+    const key = item.dataset.view;
+    item.style.display = canAccessView(key) ? '' : 'none';
+  });
+  const chip = document.querySelector('.user-chip span');
+  const avatar = document.querySelector('.user-chip .avatar');
+  if(chip) chip.textContent = state.currentUser ? (state.currentUser.nome || state.currentUser.usuario) : '';
+  if(avatar) avatar.textContent = state.currentUser ? (state.currentUser.usuario||'?').charAt(0).toUpperCase() : '?';
 }
 
 document.getElementById('logoutBtn').addEventListener('click', ()=>{
   safeStorage('removeItem','nacoes_session');
+  safeStorage('removeItem','nacoes_current_user');
+  state.currentUser = null;
   document.getElementById('appShell').classList.add('hidden');
   document.getElementById('loginScreen').classList.remove('hidden');
 });
@@ -907,10 +1081,15 @@ const viewTitles = {
   'ind-contato':'Indicador de Contato por Origem','ind-propostas':'Indicador de Propostas Enviadas',
   'ind-contatos-realizados':'Indicador de Contatos Realizados','ind-aprovados':'Indicador de Aprovados',
   'cad-vendedores':'Cadastro de Vendedores','cad-origens':'Cadastro de Origens',
-  'cad-motivos':'Cadastro de Motivos de Reprovação','cad-metas':'Cadastro de Metas'
+  'cad-motivos':'Cadastro de Motivos de Reprovação','cad-metas':'Cadastro de Metas',
+  'cad-usuarios':'Usuários e Permissões'
 };
 
 function goToView(view){
+  if(!canAccessView(view)){
+    showToast('Você não tem permissão para acessar esta tela.', true);
+    view = 'dashboard';
+  }
   state.currentView = view;
   document.querySelectorAll('.nav-item[data-view]').forEach(el=>{
     el.classList.toggle('active', el.dataset.view === view);
@@ -925,6 +1104,7 @@ function goToView(view){
   if(view === 'cad-vendedores') renderCadastroSimples('vendedores');
   if(view === 'cad-origens') renderCadastroSimples('origens');
   if(view === 'cad-motivos') renderCadastroSimples('motivos_reprovacao');
+  if(view === 'cad-usuarios') renderCadastroUsuarios();
   if(view === 'ind-contato') renderIndicadorContato();
   if(view === 'ind-propostas') renderIndicadorMeta('propostas');
   if(view === 'ind-contatos-realizados') renderIndicadorMeta('contatos_realizados');
@@ -1060,7 +1240,7 @@ function drawOrcamentosTable(){
       <td>${o.origem?.nome||'—'}</td>
       <td>${o.vendedor?.nome||'—'}</td>
       <td>${situacaoSelectHtml(o)}</td>
-      <td>${fmtDate(o.data_fechamento)}</td>
+      <td>${firstFollowupCell(o)}</td>
       <td class="row-actions">
         <button title="Ligações / Follow-up" data-followup="${o.id}">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
@@ -1081,6 +1261,15 @@ function drawOrcamentosTable(){
   tbody.querySelectorAll('[data-situacao-select]').forEach(sel=>{
     sel.addEventListener('change', (e)=> quickChangeSituacao(sel.dataset.situacaoSelect, e.target.value));
   });
+}
+function firstFollowupCell(o){
+  const list = parseFollowups(o.followup);
+  if(!list.length) return '<span class="muted">—</span>';
+  const f = list[0];
+  const txt = (f.observacao||'').trim() || '(sem observação)';
+  const short = txt.length > 34 ? txt.slice(0,34)+'…' : txt;
+  const full = `1ª Ligação (${fmtDate(f.data)}): ${txt}`.replace(/"/g,'&quot;');
+  return `<span title="${full}">${short}</span>`;
 }
 function situacaoBadge(sit){
   if(sit==='Aberto') return '<span class="badge badge-blue">Aberto</span>';
@@ -1763,6 +1952,130 @@ document.getElementById('btnSalvarMetas').addEventListener('click', async ()=>{
   if(error){ showToast('Erro ao salvar metas: '+error.message, true); return; }
   showToast('Metas salvas com sucesso.');
 });
+
+/* =====================================================================
+   USUÁRIOS E PERMISSÕES
+   ===================================================================== */
+document.getElementById('toggleUsrSenha').addEventListener('click', ()=>{
+  const inp = document.getElementById('usrSenha');
+  const isPass = inp.type === 'password';
+  inp.type = isPass ? 'text' : 'password';
+  document.getElementById('usrEyeIcon').innerHTML = isPass
+    ? '<path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.6 21.6 0 0 1 5.06-6.94M9.9 4.24A10.5 10.5 0 0 1 12 4c7 0 11 8 11 8a21.6 21.6 0 0 1-3.22 4.44M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/>'
+    : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/>';
+});
+
+async function renderCadastroUsuarios(){
+  if(!sb) return;
+  const { data, error } = await sb.from('usuarios').select('*').order('nome');
+  const tbody = document.getElementById('usuariosTableBody');
+  if(error){ showToast('Erro ao carregar usuários: '+error.message, true); return; }
+  const rows = data || [];
+  const allRows = [
+    { id:null, nome:'Administrador', usuario: AUTH_USER, ativo:true, isFixed:true },
+    ...rows
+  ];
+  if(allRows.length===0){
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="4">Nenhum usuário cadastrado.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = allRows.map(u=>`
+    <tr>
+      <td>${u.nome}${u.isFixed ? ' <span class="badge badge-blue">Fixo</span>' : ''}</td>
+      <td>${u.usuario}</td>
+      <td>${u.ativo ? '<span class="badge badge-green">Ativo</span>' : '<span class="badge badge-gray">Inativo</span>'}</td>
+      <td class="row-actions">
+        ${u.isFixed ? '<span class="muted small">acesso total, fixo</span>' : `
+          <button title="Editar" data-editusr="${u.id}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+          </button>
+          <button title="Excluir" class="danger" data-delusr="${u.id}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
+          </button>
+        `}
+      </td>
+    </tr>
+  `).join('');
+  tbody.querySelectorAll('[data-editusr]').forEach(b=> b.addEventListener('click', ()=> openUsuarioModal(rows.find(r=>r.id===b.dataset.editusr))));
+  tbody.querySelectorAll('[data-delusr]').forEach(b=> b.addEventListener('click', ()=> deleteUsuario(b.dataset.delusr)));
+}
+
+document.getElementById('btnNovoUsuario').addEventListener('click', ()=> openUsuarioModal(null));
+
+function openUsuarioModal(u){
+  document.getElementById('modalUsuarioTitle').textContent = u ? 'Editar Usuário' : 'Novo Usuário';
+  document.getElementById('usrId').value = u ? u.id : '';
+  document.getElementById('usrNome').value = u ? u.nome : '';
+  document.getElementById('usrUsuario').value = u ? u.usuario : '';
+  document.getElementById('usrUsuario').disabled = !!u; // não permite trocar o login depois de criado
+  document.getElementById('usrSenha').value = '';
+  document.getElementById('usrSenha').placeholder = u ? 'Deixe em branco para manter a senha atual' : 'Digite uma senha';
+  document.getElementById('usrAtivo').checked = u ? u.ativo : true;
+
+  const perms = (u && u.permissoes) || {};
+  const wrap = document.getElementById('usrPermissoesList');
+  wrap.innerHTML = VIEW_LIST.map(v=>`
+    <div class="perm-row">
+      <input type="checkbox" id="perm_${v.key}" data-perm="${v.key}" ${perms[v.key]===true?'checked':''} />
+      <label for="perm_${v.key}">${v.label}</label>
+    </div>
+  `).join('');
+
+  openModal('modalUsuario');
+}
+
+document.getElementById('btnSalvarUsuario').addEventListener('click', async ()=>{
+  const id = document.getElementById('usrId').value;
+  const nome = document.getElementById('usrNome').value.trim();
+  const usuario = document.getElementById('usrUsuario').value.trim().toLowerCase();
+  const senha = document.getElementById('usrSenha').value;
+
+  if(!nome || !usuario){ showToast('Informe nome e usuário.', true); return; }
+  if(usuario === AUTH_USER.toLowerCase()){ showToast('Este nome de usuário é reservado para o administrador fixo.', true); return; }
+  if(!id && !senha){ showToast('Informe uma senha para o novo usuário.', true); return; }
+  if(senha && senha.length < 4){ showToast('A senha deve ter pelo menos 4 caracteres.', true); return; }
+
+  const permissoes = {};
+  document.querySelectorAll('#usrPermissoesList [data-perm]').forEach(chk=>{
+    permissoes[chk.dataset.perm] = chk.checked;
+  });
+
+  const payload = {
+    nome, usuario, ativo: document.getElementById('usrAtivo').checked,
+    permissoes, updated_at: new Date().toISOString()
+  };
+  if(senha){
+    try{
+      payload.senha_hash = await sha256Hex(senha);
+    }catch(err){
+      showToast(err.message, true);
+      return;
+    }
+  }
+
+  let error;
+  if(id){
+    ({error} = await sb.from('usuarios').update(payload).eq('id', id));
+  } else {
+    ({error} = await sb.from('usuarios').insert(payload));
+  }
+  if(error){
+    const msg = (error.message||'').includes('duplicate') ? 'Já existe um usuário com esse login.' : error.message;
+    showToast('Erro ao salvar usuário: '+msg, true);
+    return;
+  }
+  showToast('Usuário salvo com sucesso.');
+  closeModal('modalUsuario');
+  renderCadastroUsuarios();
+});
+
+async function deleteUsuario(id){
+  if(!confirm('Excluir este usuário? Ele perderá o acesso ao sistema imediatamente.')) return;
+  const { error } = await sb.from('usuarios').delete().eq('id', id);
+  if(error){ showToast('Erro ao excluir: '+error.message, true); return; }
+  showToast('Usuário excluído.');
+  renderCadastroUsuarios();
+}
 
 </script>
 </body>
