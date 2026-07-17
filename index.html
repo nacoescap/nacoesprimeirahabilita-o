@@ -604,7 +604,7 @@ tbody tr:last-child td{border-bottom:none;}
           <table>
             <thead><tr>
               <th>Abertura</th><th>Cliente</th><th>WhatsApp</th><th>CPF</th><th>Valor</th>
-              <th>Aulas</th><th>Origem</th><th>Vendedor</th><th>Situação</th><th>Follow-up</th><th>Ações</th>
+              <th>Carteira</th><th>Aulas</th><th>Origem</th><th>Vendedor</th><th>Situação</th><th>Follow-up</th><th>Ações</th>
             </tr></thead>
             <tbody id="orcTableBody"></tbody>
           </table>
@@ -705,7 +705,7 @@ tbody tr:last-child td{border-bottom:none;}
         <div class="toolbar"><input type="text" class="search-input" id="aulSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Cliente</th><th>WhatsApp</th><th>Nº Aulas</th><th>Situação</th><th>Ações</th></tr></thead>
+            <thead><tr><th>Cliente</th><th>WhatsApp</th><th>Carteira</th><th>Nº Aulas</th><th>Situação</th><th>Ações</th></tr></thead>
             <tbody id="aulTableBody"></tbody>
           </table>
         </div>
@@ -855,7 +855,23 @@ tbody tr:last-child td{border-bottom:none;}
         <div class="field"><label>WhatsApp</label><input type="text" id="orcWhatsapp" placeholder="(00) 00000-0000" maxlength="15" /></div>
         <div class="field"><label>CPF</label><input type="text" id="orcCpf" placeholder="000.000.000-00" maxlength="14" /></div>
         <div class="field"><label>Valor (R$)</label><input type="number" step="0.01" min="0" id="orcValor" placeholder="0,00" /></div>
-        <div class="field"><label>Número de Aulas</label><input type="number" min="0" id="orcAulas" placeholder="0" /></div>
+        <div class="field">
+          <label>Carteira</label>
+          <select id="orcCarteira">
+            <option value="">Selecione a carteira</option>
+            <option value="A">Carteira A</option>
+            <option value="B">Carteira B</option>
+            <option value="AB">Carteira AB</option>
+          </select>
+        </div>
+        <div class="field hidden" id="orcAulasAWrap">
+          <label id="orcAulasALabel">Número de Aulas</label>
+          <input type="number" min="0" id="orcAulasA" placeholder="0" />
+        </div>
+        <div class="field hidden" id="orcAulasBWrap">
+          <label id="orcAulasBLabel">Número de Aulas</label>
+          <input type="number" min="0" id="orcAulasB" placeholder="0" />
+        </div>
         <div class="field">
           <label>Origem</label>
           <div class="select-with-btn">
@@ -1760,7 +1776,7 @@ function drawOrcamentosTable(){
 
   const tbody = document.getElementById('orcTableBody');
   if(rows.length === 0){
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="11">Nenhum orçamento encontrado.</td></tr>`;
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="12">Nenhum orçamento encontrado.</td></tr>`;
     return;
   }
   tbody.innerHTML = rows.map(o=>`
@@ -1770,7 +1786,8 @@ function drawOrcamentosTable(){
       <td>${o.whatsapp||'—'}</td>
       <td>${o.cpf||'—'}</td>
       <td>${fmtMoney(o.valor)}</td>
-      <td>${o.numero_aulas||0}</td>
+      <td>${carteiraBadge(o.carteira)}</td>
+      <td>${aulasBreakdownCell(o)}</td>
       <td>${o.origem?.nome||'—'}</td>
       <td>${o.vendedor?.nome||'—'}</td>
       <td>${situacaoSelectHtml(o)}</td>
@@ -1804,6 +1821,18 @@ function firstFollowupCell(o){
   const short = txt.length > 34 ? txt.slice(0,34)+'…' : txt;
   const full = `1ª Ligação (${fmtDate(f.data)}): ${txt}`.replace(/"/g,'&quot;');
   return `<span title="${full}">${short}</span>`;
+}
+function carteiraBadge(c){
+  if(c === 'A') return '<span class="badge badge-blue">Carteira A</span>';
+  if(c === 'B') return '<span class="badge badge-blue">Carteira B</span>';
+  if(c === 'AB') return '<span class="badge badge-blue">Carteira AB</span>';
+  return '<span class="muted">—</span>';
+}
+function aulasBreakdownCell(o){
+  if(o.carteira === 'AB'){
+    return `A: ${o.aulas_carteira_a||0} · B: ${o.aulas_carteira_b||0}`;
+  }
+  return `${o.numero_aulas||0}`;
 }
 function situacaoBadge(sit){
   if(sit==='Aberto') return '<span class="badge badge-blue">Aberto</span>';
@@ -1900,6 +1929,36 @@ function updateOrcSituacaoUI(){
   document.getElementById('orcEnvioHint').style.display = sit === 'Enviado ao Cliente' ? 'block' : 'none';
 }
 
+document.getElementById('orcCarteira').addEventListener('change', updateOrcCarteiraUI);
+
+function updateOrcCarteiraUI(){
+  const carteira = document.getElementById('orcCarteira').value;
+  const wrapA = document.getElementById('orcAulasAWrap');
+  const wrapB = document.getElementById('orcAulasBWrap');
+  const labelA = document.getElementById('orcAulasALabel');
+  const labelB = document.getElementById('orcAulasBLabel');
+
+  if(carteira === 'AB'){
+    wrapA.classList.remove('hidden');
+    wrapB.classList.remove('hidden');
+    labelA.textContent = 'Número de Aulas (Carteira A)';
+    labelB.textContent = 'Número de Aulas (Carteira B)';
+  } else if(carteira === 'A'){
+    wrapA.classList.remove('hidden');
+    wrapB.classList.add('hidden');
+    labelA.textContent = 'Número de Aulas (Carteira A)';
+    document.getElementById('orcAulasB').value = '';
+  } else if(carteira === 'B'){
+    wrapA.classList.add('hidden');
+    wrapB.classList.remove('hidden');
+    labelB.textContent = 'Número de Aulas (Carteira B)';
+    document.getElementById('orcAulasA').value = '';
+  } else {
+    wrapA.classList.add('hidden');
+    wrapB.classList.add('hidden');
+  }
+}
+
 function openOrcamentoModal(id){
   const editing = !!id;
   document.getElementById('modalOrcamentoTitle').textContent = editing ? 'Editar Orçamento' : 'Novo Orçamento';
@@ -1911,7 +1970,9 @@ function openOrcamentoModal(id){
     document.getElementById('orcWhatsapp').value = o.whatsapp || '';
     document.getElementById('orcCpf').value = o.cpf || '';
     document.getElementById('orcValor').value = o.valor || '';
-    document.getElementById('orcAulas').value = o.numero_aulas || '';
+    document.getElementById('orcCarteira').value = o.carteira || '';
+    document.getElementById('orcAulasA').value = o.aulas_carteira_a || '';
+    document.getElementById('orcAulasB').value = o.aulas_carteira_b || '';
     document.getElementById('orcOrigem').value = o.origem_id || '';
     document.getElementById('orcVendedor').value = o.vendedor_id || '';
     currentFollowups = parseFollowups(o.followup);
@@ -1924,7 +1985,9 @@ function openOrcamentoModal(id){
     document.getElementById('orcWhatsapp').value = '';
     document.getElementById('orcCpf').value = '';
     document.getElementById('orcValor').value = '';
-    document.getElementById('orcAulas').value = '';
+    document.getElementById('orcCarteira').value = '';
+    document.getElementById('orcAulasA').value = '';
+    document.getElementById('orcAulasB').value = '';
     document.getElementById('orcOrigem').value = '';
     document.getElementById('orcVendedor').value = '';
     currentFollowups = [];
@@ -1934,6 +1997,7 @@ function openOrcamentoModal(id){
   }
   renderFollowupList();
   updateOrcSituacaoUI();
+  updateOrcCarteiraUI();
   openModal('modalOrcamento');
 }
 
@@ -2087,13 +2151,20 @@ document.getElementById('btnSalvarOrcamento').addEventListener('click', async ()
   if(!cliente){ showToast('Informe o nome do cliente.', true); return; }
   const situacao = document.getElementById('orcSituacao').value;
 
+  const carteira = document.getElementById('orcCarteira').value || null;
+  const aulasA = carteira === 'A' || carteira === 'AB' ? (Number(document.getElementById('orcAulasA').value) || 0) : 0;
+  const aulasB = carteira === 'B' || carteira === 'AB' ? (Number(document.getElementById('orcAulasB').value) || 0) : 0;
+
   const payload = {
     data_abertura: document.getElementById('orcDataAbertura').value || todayISO(),
     cliente,
     whatsapp: document.getElementById('orcWhatsapp').value || null,
     cpf: document.getElementById('orcCpf').value || null,
     valor: Number(document.getElementById('orcValor').value) || 0,
-    numero_aulas: Number(document.getElementById('orcAulas').value) || 0,
+    carteira,
+    aulas_carteira_a: aulasA,
+    aulas_carteira_b: aulasB,
+    numero_aulas: aulasA + aulasB,
     origem_id: document.getElementById('orcOrigem').value || null,
     vendedor_id: document.getElementById('orcVendedor').value || null,
     followup: currentFollowups.length ? JSON.stringify(currentFollowups) : null,
@@ -2537,10 +2608,12 @@ function drawAulasTable(){
   const search = document.getElementById('aulSearch').value.toLowerCase();
   const rows = state.aulas.filter(o => !search || (o.cliente||'').toLowerCase().includes(search));
   const tbody = document.getElementById('aulTableBody');
-  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="5">Nenhum aluno nesta etapa.</td></tr>`; return; }
+  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="6">Nenhum aluno nesta etapa.</td></tr>`; return; }
   tbody.innerHTML = rows.map(o=>`
     <tr>
-      <td>${o.cliente||''}</td><td>${o.whatsapp||'—'}</td><td>${o.numero_aulas||0}</td>
+      <td>${o.cliente||''}</td><td>${o.whatsapp||'—'}</td>
+      <td>${carteiraBadge(o.carteira)}</td>
+      <td>${aulasBreakdownCell(o)}</td>
       <td>${pendenteBadge(!!o.data_aula_agendada, 'Agendado')}</td>
       <td class="row-actions">
         <button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button>
