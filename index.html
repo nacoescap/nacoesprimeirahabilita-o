@@ -2955,7 +2955,6 @@ document.getElementById('btnSalvarEnviado').addEventListener('click', async ()=>
   };
   if(situacao_cliente === 'Aprovado'){
     payload.data_aprovacao = todayISO();
-    if(o && !o.etapa){ payload.etapa = 'exames'; payload.situacao_etapa = 'Em Andamento'; }
   } else {
     payload.data_aprovacao = null;
     payload.etapa = null;
