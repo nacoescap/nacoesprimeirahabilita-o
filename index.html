@@ -440,31 +440,39 @@ tbody tr:last-child td{border-bottom:none;}
       <div class="nav-group">
         <div class="nav-group-label">Vendas</div>
         <div class="nav-item" data-view="orcamentos">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h6M9 11h6"/></svg>
-          <span>Orçamentos</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Leads</span>
         </div>
         <div class="nav-item" data-view="enviados">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4Z"/></svg>
-          <span>Enviado ao Cliente</span>
+          <span>Orçamento enviado</span>
         </div>
         <div class="nav-item" data-view="aprovados">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
           <span>Aprovados</span>
+        </div>
+        <div class="nav-item" data-view="assinatura-contrato">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15l1.5 1.5L14 13"/></svg>
+          <span>Assinatura de contrato</span>
+        </div>
+        <div class="nav-item" data-view="cobranca-contrato">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+          <span>Cobrança</span>
         </div>
       </div>
       <div class="nav-group">
         <div class="nav-group-label">Processo do Aluno</div>
         <div class="nav-item" data-view="exames">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8M16 17H8M10 9H8"/></svg>
-          <span>Exames</span>
+          <span>Exame médico e psico</span>
         </div>
         <div class="nav-item" data-view="conferencia">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-          <span>Conferência de Resultados</span>
+          <span>Conferência de resultados</span>
         </div>
         <div class="nav-item" data-view="alunos-reprovados">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
-          <span>Alunos Reprovados</span>
+          <span>Reprovado no psico/médico</span>
         </div>
         <div class="nav-item" data-view="cobranca">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
@@ -472,23 +480,47 @@ tbody tr:last-child td{border-bottom:none;}
         </div>
         <div class="nav-item" data-view="aulas">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-          <span>Agendamento de Aulas</span>
+          <span>Curso teórico</span>
         </div>
         <div class="nav-item" data-view="agendados">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg>
-          <span>Alunos Agendados</span>
+          <span>Curso teórico concluído</span>
+        </div>
+        <div class="nav-item" data-view="cobranca-curso">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+          <span>Cobrança</span>
+        </div>
+        <div class="nav-item" data-view="prova-escrita-agendamento">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M12 15v-4M12 15h.01"/></svg>
+          <span>Agend. prova escrita</span>
+        </div>
+        <div class="nav-item" data-view="prova-escrita-aguardando">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          <span>Aguardando result. prova</span>
+        </div>
+        <div class="nav-item" data-view="prova-escrita-reprovado">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+          <span>Reprovado na prova escrita</span>
+        </div>
+        <div class="nav-item" data-view="conferencia-cobranca">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><rect x="2" y="5" width="14" height="14" rx="2"/></svg>
+          <span>Conferência de cobrança</span>
         </div>
         <div class="nav-item" data-view="teste-pratico">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 16H9m10 0h-3"/><path d="M2 8h20"/><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/></svg>
-          <span>Agend. Teste Prático</span>
+          <span>Agend. aulas práticas</span>
         </div>
         <div class="nav-item" data-view="resultado-teste">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          <span>Agend. teste de volante</span>
+        </div>
+        <div class="nav-item" data-view="teste-volante-resultado">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 6 7 1-5 5 1.5 7-6.5-3.5L5 21l1.5-7-5-5 7-1z"/></svg>
-          <span>Resultado do Teste</span>
+          <span>Resultado teste de volante</span>
         </div>
         <div class="nav-item" data-view="clientes-aprovados">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
-          <span>Clientes Aprovados</span>
+          <span>Alunos aprovados</span>
         </div>
       </div>
       <div class="nav-group">
@@ -584,6 +616,11 @@ tbody tr:last-child td{border-bottom:none;}
           <div class="mini-chart-card"><div class="mini-chart-title">Por Origem</div><div class="mini-chart-canvas-wrap"><canvas id="chartOrigem"></canvas></div></div>
           <div class="mini-chart-card"><div class="mini-chart-title">Aprovados (Ano)</div><div class="mini-chart-canvas-wrap"><canvas id="chartAnual"></canvas></div></div>
         </div>
+
+        <div class="card" style="margin-top:16px;">
+          <div class="mini-chart-title" style="margin-bottom:10px;">Funil de Etapas · Alunos por Fase</div>
+          <div style="position:relative;height:560px;"><canvas id="chartFunil"></canvas></div>
+        </div>
       </section>
 
       <!-- ============ ORÇAMENTOS ============ -->
@@ -598,13 +635,13 @@ tbody tr:last-child td{border-bottom:none;}
           <select id="orcFiltroVendedor"><option value="">Vendedor: Todos</option></select>
           <select id="orcFiltroOrigem"><option value="">Origem: Todas</option></select>
           <div class="spacer"></div>
-          <button class="btn btn-yellow" id="btnNovoOrcamento">+ Novo Orçamento</button>
+          <button class="btn btn-yellow" id="btnNovoOrcamento">+ Novo Lead</button>
         </div>
         <div class="table-wrap">
           <table>
             <thead><tr>
               <th>Abertura</th><th>Cliente</th><th>WhatsApp</th><th>CPF</th><th>Valor</th>
-              <th>Carteira</th><th>Aulas</th><th>Origem</th><th>Vendedor</th><th>Situação</th><th>Follow-up</th><th>Ações</th>
+              <th>Carteira</th><th>Aulas</th><th>Origem</th><th>Vendedor</th><th>Situação</th><th>Lead time</th><th>Follow-up</th><th>Ações</th>
             </tr></thead>
             <tbody id="orcTableBody"></tbody>
           </table>
@@ -626,7 +663,7 @@ tbody tr:last-child td{border-bottom:none;}
           <table>
             <thead><tr>
               <th>Envio</th><th>Cliente</th><th>WhatsApp</th><th>Valor</th><th>Origem</th>
-              <th>Vendedor</th><th>Situação Cliente</th><th>Data Aprovação</th><th>Follow-up</th><th>Ações</th>
+              <th>Vendedor</th><th>Situação Cliente</th><th>Data Aprovação</th><th>Lead time</th><th>Follow-up</th><th>Ações</th>
             </tr></thead>
             <tbody id="envTableBody"></tbody>
           </table>
@@ -644,20 +681,44 @@ tbody tr:last-child td{border-bottom:none;}
           <table>
             <thead><tr>
               <th>Aprovação</th><th>Cliente</th><th>WhatsApp</th><th>Valor</th><th>Origem</th>
-              <th>Vendedor</th><th>Situação</th><th>Etapa Atual</th><th>Follow-up</th><th>Fechamento</th><th>Ações</th>
+              <th>Vendedor</th><th>Situação</th><th>Etapa Atual</th><th>Lead time</th><th>Follow-up</th><th>Fechamento</th><th>Ações</th>
             </tr></thead>
             <tbody id="aprTableBody"></tbody>
           </table>
         </div>
       </section>
 
-      <!-- ============ EXAMES (Assinatura e Agendamento) ============ -->
+      <!-- ============ ASSINATURA DE CONTRATO ============ -->
+      <section class="view" id="view-assinatura-contrato">
+        <p class="helper-text">Alunos aprovados na venda entram aqui automaticamente. Ao marcar como "Concluído", o aluno passa para a Cobrança.</p>
+        <div class="toolbar"><input type="text" class="search-input" id="assContSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Cliente</th><th>WhatsApp</th><th>Valor</th><th>Vendedor</th><th>Situação</th><th>Lead time</th><th>Follow-up</th><th>Ações</th></tr></thead>
+            <tbody id="assContTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ COBRANÇA (CONTRATO) ============ -->
+      <section class="view" id="view-cobranca-contrato">
+        <p class="helper-text">Ao marcar como pago, o aluno segue para o Exame Médico e Psico.</p>
+        <div class="toolbar"><input type="text" class="search-input" id="cobContSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Cliente</th><th>WhatsApp</th><th>Valor</th><th>Situação</th><th>Lead time</th><th>Ações</th></tr></thead>
+            <tbody id="cobContTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ EXAME MÉDICO E PSICO ============ -->
       <section class="view" id="view-exames">
-        <p class="helper-text">Alunos aprovados na venda entram aqui automaticamente. Ao marcar como "Concluído", o aluno passa para a Conferência de Resultados.</p>
+        <p class="helper-text">Alunos com contrato assinado e cobrança paga entram aqui automaticamente. Ao marcar como "Concluído", o aluno passa para a Conferência de Resultados.</p>
         <div class="toolbar"><input type="text" class="search-input" id="exaSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Cliente</th><th>WhatsApp</th><th>Valor</th><th>Vendedor</th><th>Situação</th><th>Follow-up</th><th>Ações</th></tr></thead>
+            <thead><tr><th>Cliente</th><th>WhatsApp</th><th>Valor</th><th>Vendedor</th><th>Situação</th><th>Lead time</th><th>Follow-up</th><th>Ações</th></tr></thead>
             <tbody id="exaTableBody"></tbody>
           </table>
         </div>
@@ -665,23 +726,23 @@ tbody tr:last-child td{border-bottom:none;}
 
       <!-- ============ CONFERÊNCIA DE RESULTADOS ============ -->
       <section class="view" id="view-conferencia">
-        <p class="helper-text">Se reprovado, escolha o motivo e o aluno vai para "Alunos Reprovados". Se aprovado, segue para Cobrança.</p>
+        <p class="helper-text">Se reprovado, escolha o motivo e o aluno vai para "Reprovado no psico/médico". Se aprovado, segue para Cobrança.</p>
         <div class="toolbar"><input type="text" class="search-input" id="confSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Cliente</th><th>WhatsApp</th><th>Vendedor</th><th>Situação</th><th>Motivo (se reprovado)</th><th>Ações</th></tr></thead>
+            <thead><tr><th>Cliente</th><th>WhatsApp</th><th>Vendedor</th><th>Situação</th><th>Motivo (se reprovado)</th><th>Lead time</th><th>Ações</th></tr></thead>
             <tbody id="confTableBody"></tbody>
           </table>
         </div>
       </section>
 
-      <!-- ============ ALUNOS REPROVADOS ============ -->
+      <!-- ============ REPROVADO NO PSICO/MÉDICO ============ -->
       <section class="view" id="view-alunos-reprovados">
         <p class="helper-text">Quando concluir a repescagem, o aluno volta para a Conferência de Resultados para nova avaliação.</p>
         <div class="toolbar"><input type="text" class="search-input" id="reprSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Cliente</th><th>WhatsApp</th><th>Motivo da Reprovação</th><th>Situação</th><th>Ações</th></tr></thead>
+            <thead><tr><th>Cliente</th><th>WhatsApp</th><th>Motivo da Reprovação</th><th>Situação</th><th>Lead time</th><th>Ações</th></tr></thead>
             <tbody id="reprTableBody"></tbody>
           </table>
         </div>
@@ -689,31 +750,31 @@ tbody tr:last-child td{border-bottom:none;}
 
       <!-- ============ COBRANÇA ============ -->
       <section class="view" id="view-cobranca">
-        <p class="helper-text">Ao marcar como pago, o aluno segue para o Agendamento de Aulas Práticas.</p>
+        <p class="helper-text">Ao marcar como pago, o aluno segue para o Curso Teórico.</p>
         <div class="toolbar"><input type="text" class="search-input" id="cobSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Cliente</th><th>WhatsApp</th><th>Valor</th><th>Situação</th><th>Ações</th></tr></thead>
+            <thead><tr><th>Cliente</th><th>WhatsApp</th><th>Valor</th><th>Situação</th><th>Lead time</th><th>Ações</th></tr></thead>
             <tbody id="cobTableBody"></tbody>
           </table>
         </div>
       </section>
 
-      <!-- ============ AGENDAMENTO DE AULAS PRÁTICAS ============ -->
+      <!-- ============ CURSO TEÓRICO ============ -->
       <section class="view" id="view-aulas">
-        <p class="helper-text">Ao agendar (data + turma), o aluno passa para "Alunos Agendados".</p>
+        <p class="helper-text">Ao agendar (data + turma), o aluno passa para "Curso Teórico Concluído".</p>
         <div class="toolbar"><input type="text" class="search-input" id="aulSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Cliente</th><th>WhatsApp</th><th>Carteira</th><th>Nº Aulas</th><th>Situação</th><th>Ações</th></tr></thead>
+            <thead><tr><th>Cliente</th><th>WhatsApp</th><th>Carteira</th><th>Nº Aulas</th><th>Situação</th><th>Lead time</th><th>Ações</th></tr></thead>
             <tbody id="aulTableBody"></tbody>
           </table>
         </div>
       </section>
 
-      <!-- ============ ALUNOS AGENDADOS ============ -->
+      <!-- ============ CURSO TEÓRICO CONCLUÍDO ============ -->
       <section class="view" id="view-agendados">
-        <p class="helper-text">Se reprovado aqui, o aluno volta para o Agendamento de Aulas para reagendar. Se aprovado, segue para o Agendamento de Teste Prático.</p>
+        <p class="helper-text">Se reprovado aqui, o aluno volta para o Curso Teórico para reagendar. Se aprovado, segue para a Cobrança.</p>
         <div class="toolbar">
           <input type="text" class="search-input" id="agdSearch" placeholder="Buscar por cliente..." />
           <select id="agdFiltroMes"></select>
@@ -723,27 +784,87 @@ tbody tr:last-child td{border-bottom:none;}
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Cliente</th><th>Turma</th><th>Data Agendada</th><th>Nº Aulas</th><th>Situação</th><th>Ações</th></tr></thead>
+            <thead><tr><th>Cliente</th><th>Turma</th><th>Data Agendada</th><th>Nº Aulas</th><th>Situação</th><th>Lead time</th><th>Ações</th></tr></thead>
             <tbody id="agdTableBody"></tbody>
           </table>
         </div>
       </section>
 
-      <!-- ============ AGENDAMENTO DE TESTE PRÁTICO ============ -->
+      <!-- ============ COBRANÇA (CURSO) ============ -->
+      <section class="view" id="view-cobranca-curso">
+        <p class="helper-text">Ao marcar como pago, o aluno segue para o Agendamento de Prova Escrita.</p>
+        <div class="toolbar"><input type="text" class="search-input" id="cobCursoSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Cliente</th><th>WhatsApp</th><th>Valor</th><th>Situação</th><th>Lead time</th><th>Ações</th></tr></thead>
+            <tbody id="cobCursoTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ AGENDAMENTO DE PROVA ESCRITA ============ -->
+      <section class="view" id="view-prova-escrita-agendamento">
+        <p class="helper-text">Ao agendar (data + hora), o aluno passa para Aguardando Resultado da Prova Escrita.</p>
+        <div class="toolbar"><input type="text" class="search-input" id="provaAgSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Cliente</th><th>WhatsApp</th><th>Situação</th><th>Lead time</th><th>Ações</th></tr></thead>
+            <tbody id="provaAgTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ AGUARDANDO RESULTADO DA PROVA ESCRITA ============ -->
+      <section class="view" id="view-prova-escrita-aguardando">
+        <p class="helper-text">Se reprovado, o aluno vai para "Reprovado na Prova Escrita" para reprogramar. Se aprovado, segue para a Conferência de Cobrança.</p>
+        <div class="toolbar"><input type="text" class="search-input" id="provaAgdSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Cliente</th><th>Data da Prova</th><th>Hora</th><th>Situação</th><th>Lead time</th><th>Ações</th></tr></thead>
+            <tbody id="provaAgdTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ REPROVADO NA PROVA ESCRITA ============ -->
+      <section class="view" id="view-prova-escrita-reprovado">
+        <p class="helper-text">Ao reprogramar, o aluno volta para "Aguardando Resultado da Prova Escrita".</p>
+        <div class="toolbar"><input type="text" class="search-input" id="provaReprSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Cliente</th><th>WhatsApp</th><th>Situação</th><th>Lead time</th><th>Ações</th></tr></thead>
+            <tbody id="provaReprTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ CONFERÊNCIA DE COBRANÇA ============ -->
+      <section class="view" id="view-conferencia-cobranca">
+        <p class="helper-text">Confira o pagamento do curso antes de liberar o Agendamento de Aulas Práticas.</p>
+        <div class="toolbar"><input type="text" class="search-input" id="confCobSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Cliente</th><th>WhatsApp</th><th>Cobrança do Curso</th><th>Lead time</th><th>Ações</th></tr></thead>
+            <tbody id="confCobTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ AGENDAMENTO DE AULAS PRÁTICAS ============ -->
       <section class="view" id="view-teste-pratico">
-        <p class="helper-text">Ao agendar (data + hora), o aluno passa para o Resultado do Teste.</p>
+        <p class="helper-text">Ao agendar (data + hora), o aluno passa para o Agendamento de Teste de Volante.</p>
         <div class="toolbar"><input type="text" class="search-input" id="tstSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Cliente</th><th>WhatsApp</th><th>Situação</th><th>Ações</th></tr></thead>
+            <thead><tr><th>Cliente</th><th>WhatsApp</th><th>Situação</th><th>Lead time</th><th>Ações</th></tr></thead>
             <tbody id="tstTableBody"></tbody>
           </table>
         </div>
       </section>
 
-      <!-- ============ RESULTADO DO TESTE ============ -->
+      <!-- ============ AGENDAMENTO DE TESTE DE VOLANTE ============ -->
       <section class="view" id="view-resultado-teste">
-        <p class="helper-text">Se reprovado, o aluno volta para o Agendamento de Teste Prático. Se aprovado, segue para Clientes Aprovados.</p>
+        <p class="helper-text">Ao agendar (data + hora), o aluno passa para o Resultado do Teste de Volante.</p>
         <div class="toolbar">
           <input type="text" class="search-input" id="resSearch" placeholder="Buscar por cliente..." />
           <select id="resFiltroMes"></select>
@@ -752,18 +873,30 @@ tbody tr:last-child td{border-bottom:none;}
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Cliente</th><th>Data do Teste</th><th>Hora</th><th>Situação</th><th>Ações</th></tr></thead>
+            <thead><tr><th>Cliente</th><th>WhatsApp</th><th>Situação</th><th>Lead time</th><th>Ações</th></tr></thead>
             <tbody id="resTableBody"></tbody>
           </table>
         </div>
       </section>
 
-      <!-- ============ CLIENTES APROVADOS (final) ============ -->
+      <!-- ============ RESULTADO TESTE DE VOLANTE ============ -->
+      <section class="view" id="view-teste-volante-resultado">
+        <p class="helper-text">Se reprovado, o aluno volta para o Agendamento de Teste de Volante. Se aprovado, segue para Alunos Aprovados.</p>
+        <div class="toolbar"><input type="text" class="search-input" id="volResSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Cliente</th><th>Data do Teste</th><th>Hora</th><th>Situação</th><th>Lead time</th><th>Ações</th></tr></thead>
+            <tbody id="volResTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ ALUNOS APROVADOS (final) ============ -->
       <section class="view" id="view-clientes-aprovados">
         <div class="toolbar"><input type="text" class="search-input" id="finSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Cliente</th><th>WhatsApp</th><th>Valor</th><th>Vendedor</th><th>Turma</th><th>Data do Teste</th><th>Ações</th></tr></thead>
+            <thead><tr><th>Cliente</th><th>WhatsApp</th><th>Valor</th><th>Vendedor</th><th>Turma</th><th>Data do Teste</th><th>Lead time</th><th>Ações</th></tr></thead>
             <tbody id="finTableBody"></tbody>
           </table>
         </div>
@@ -842,7 +975,7 @@ tbody tr:last-child td{border-bottom:none;}
 <div class="modal-overlay hidden" id="modalOrcamento">
   <div class="modal modal-wide">
     <div class="modal-header">
-      <h3 id="modalOrcamentoTitle">Novo Orçamento</h3>
+      <h3 id="modalOrcamentoTitle">Novo Lead</h3>
       <button class="modal-close" data-close="modalOrcamento">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
       </button>
@@ -899,7 +1032,7 @@ tbody tr:last-child td{border-bottom:none;}
           <label>Situação</label>
           <select id="orcSituacao">
             <option value="Aberto">Aberto</option>
-            <option value="Enviado ao Cliente">Enviado ao Cliente</option>
+            <option value="Enviado ao Cliente">Orçamento enviado</option>
             <option value="Reprovado">Reprovado</option>
           </select>
         </div>
@@ -914,7 +1047,7 @@ tbody tr:last-child td{border-bottom:none;}
         </div>
         <div class="field"><label>Data de Fechamento</label><input type="date" id="orcDataFechamento" /></div>
       </div>
-      <p class="helper-text" id="orcEnvioHint">Ao marcar a situação como "Enviado ao Cliente", este orçamento sairá desta lista e passará para a tela "Enviado ao Cliente".</p>
+      <p class="helper-text" id="orcEnvioHint">Ao marcar a situação como "Enviado ao Cliente", este orçamento sairá desta lista e passará para a tela "Orçamento enviado".</p>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" data-close="modalOrcamento">Cancelar</button>
@@ -1175,6 +1308,120 @@ tbody tr:last-child td{border-bottom:none;}
   </div>
 </div>
 
+<!-- ============================================================= -->
+<!-- MODAL: AGENDAMENTO DE TESTE DE VOLANTE                         -->
+<!-- ============================================================= -->
+<div class="modal-overlay hidden" id="modalAgendarVolante">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Agendar Teste de Volante</h3>
+      <button class="modal-close" data-close="modalAgendarVolante">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="volOrcId" />
+      <div class="field"><label>Data</label><input type="date" id="volData" /></div>
+      <div class="field"><label>Hora</label><input type="time" id="volHora" /></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-close="modalAgendarVolante">Cancelar</button>
+      <button class="btn btn-primary" id="btnConfirmarAgendaVolante">Confirmar Agendamento</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- MODAL: ASSINATURA DE CONTRATO (nada a preencher, ação rápida)  -->
+<!-- ============================================================= -->
+
+<!-- ============================================================= -->
+<!-- MODAL: PAGAMENTO (CONTRATO)                                    -->
+<!-- ============================================================= -->
+<div class="modal-overlay hidden" id="modalPagamentoContrato">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Registrar Pagamento</h3>
+      <button class="modal-close" data-close="modalPagamentoContrato">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="pagContOrcId" />
+      <div class="field"><label>Data do Pagamento</label><input type="date" id="pagContData" /></div>
+      <div class="field">
+        <label>Forma de Pagamento</label>
+        <select id="pagContForma">
+          <option value="Pix">Pix</option>
+          <option value="Dinheiro">Dinheiro</option>
+          <option value="Cartão de Crédito">Cartão de Crédito</option>
+          <option value="Cartão de Débito">Cartão de Débito</option>
+          <option value="Boleto">Boleto</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-close="modalPagamentoContrato">Cancelar</button>
+      <button class="btn btn-primary" id="btnConfirmarPagamentoContrato">Confirmar Pagamento</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- MODAL: PAGAMENTO (CURSO)                                       -->
+<!-- ============================================================= -->
+<div class="modal-overlay hidden" id="modalPagamentoCurso">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Registrar Pagamento</h3>
+      <button class="modal-close" data-close="modalPagamentoCurso">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="pagCursoOrcId" />
+      <div class="field"><label>Data do Pagamento</label><input type="date" id="pagCursoData" /></div>
+      <div class="field">
+        <label>Forma de Pagamento</label>
+        <select id="pagCursoForma">
+          <option value="Pix">Pix</option>
+          <option value="Dinheiro">Dinheiro</option>
+          <option value="Cartão de Crédito">Cartão de Crédito</option>
+          <option value="Cartão de Débito">Cartão de Débito</option>
+          <option value="Boleto">Boleto</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-close="modalPagamentoCurso">Cancelar</button>
+      <button class="btn btn-primary" id="btnConfirmarPagamentoCurso">Confirmar Pagamento</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- MODAL: AGENDAMENTO DE PROVA ESCRITA                            -->
+<!-- ============================================================= -->
+<div class="modal-overlay hidden" id="modalAgendarProva">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Agendar Prova Escrita</h3>
+      <button class="modal-close" data-close="modalAgendarProva">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="provaOrcId" />
+      <div class="field"><label>Data</label><input type="date" id="provaData" /></div>
+      <div class="field"><label>Hora</label><input type="time" id="provaHora" /></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-close="modalAgendarProva">Cancelar</button>
+      <button class="btn btn-primary" id="btnConfirmarAgendaProva">Confirmar Agendamento</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* =====================================================================
    CONFIGURAÇÃO DO SUPABASE
@@ -1195,18 +1442,26 @@ const AUTH_PASS = 'C@pnac_2026';
 
 /* Telas controláveis por permissão (usadas no cadastro de usuários) */
 const VIEW_LIST = [
-  { key:'orcamentos', label:'Orçamentos' },
-  { key:'enviados', label:'Enviado ao Cliente' },
+  { key:'orcamentos', label:'Leads' },
+  { key:'enviados', label:'Orçamento enviado' },
   { key:'aprovados', label:'Aprovados' },
-  { key:'exames', label:'Exames' },
+  { key:'assinatura-contrato', label:'Assinatura de contrato' },
+  { key:'cobranca-contrato', label:'Cobrança (contrato)' },
+  { key:'exames', label:'Exame médico e psico' },
   { key:'conferencia', label:'Conferência de Resultados' },
-  { key:'alunos-reprovados', label:'Alunos Reprovados' },
+  { key:'alunos-reprovados', label:'Reprovado no psico/médico' },
   { key:'cobranca', label:'Cobrança' },
-  { key:'aulas', label:'Agendamento de Aulas' },
-  { key:'agendados', label:'Alunos Agendados' },
-  { key:'teste-pratico', label:'Agendamento de Teste Prático' },
-  { key:'resultado-teste', label:'Resultado do Teste' },
-  { key:'clientes-aprovados', label:'Clientes Aprovados' },
+  { key:'aulas', label:'Curso teórico' },
+  { key:'agendados', label:'Curso teórico concluído' },
+  { key:'cobranca-curso', label:'Cobrança (curso)' },
+  { key:'prova-escrita-agendamento', label:'Agend. prova escrita' },
+  { key:'prova-escrita-aguardando', label:'Aguardando resultado da prova' },
+  { key:'prova-escrita-reprovado', label:'Reprovado na prova escrita' },
+  { key:'conferencia-cobranca', label:'Conferência de cobrança' },
+  { key:'teste-pratico', label:'Agend. aulas práticas' },
+  { key:'resultado-teste', label:'Agendamento de teste de volante' },
+  { key:'teste-volante-resultado', label:'Resultado teste de volante' },
+  { key:'clientes-aprovados', label:'Alunos aprovados' },
   { key:'ind-contato', label:'Indicador: Contatos por Origem' },
   { key:'ind-propostas', label:'Indicador: Propostas Enviadas' },
   { key:'ind-contatos-realizados', label:'Indicador: Contatos Realizados' },
@@ -1232,14 +1487,22 @@ const state = {
   orcamentos: [],
   enviados: [],
   aprovados: [],
+  assinaturaContrato: [],
+  cobrancaContrato: [],
   exames: [],
   conferencia: [],
   alunosReprovados: [],
   cobranca: [],
   aulas: [],
   agendados: [],
+  cobrancaCurso: [],
+  provaEscritaAgendamento: [],
+  provaEscritaAguardando: [],
+  provaEscritaReprovado: [],
+  conferenciaCobranca: [],
   testePratico: [],
   resultadoTeste: [],
+  testeVolanteResultado: [],
   clientesAprovados: [],
   agendadosPeriodo: { ano: new Date().getFullYear(), mes: new Date().getMonth() + 1 },
   resultadoTestePeriodo: { ano: new Date().getFullYear(), mes: new Date().getMonth() + 1 },
@@ -1472,11 +1735,15 @@ document.getElementById('logoutBtn').addEventListener('click', ()=>{
    NAVEGAÇÃO
    ===================================================================== */
 const viewTitles = {
-  'dashboard':'Painel','orcamentos':'Orçamentos','enviados':'Enviado ao Cliente','aprovados':'Aprovados',
-  'exames':'Assinatura e Agendamento de Exames','conferencia':'Conferência de Resultados',
-  'alunos-reprovados':'Alunos Reprovados','cobranca':'Cobrança','aulas':'Agendamento de Aulas Práticas',
-  'agendados':'Alunos Agendados','teste-pratico':'Agendamento de Teste Prático',
-  'resultado-teste':'Resultado do Teste','clientes-aprovados':'Clientes Aprovados',
+  'dashboard':'Painel','orcamentos':'Leads','enviados':'Orçamento enviado','aprovados':'Aprovados',
+  'exames':'Exame médico e psico','conferencia':'Conferência de Resultados',
+  'alunos-reprovados':'Reprovado no psico/médico','cobranca':'Cobrança','aulas':'Curso teórico',
+  'agendados':'Curso teórico concluído','teste-pratico':'Agend. aulas práticas',
+  'resultado-teste':'Agendamento de teste de volante','clientes-aprovados':'Alunos aprovados',
+  'assinatura-contrato':'Assinatura de contrato','cobranca-contrato':'Cobrança',
+  'cobranca-curso':'Cobrança','prova-escrita-agendamento':'Agendamento de prova escrita',
+  'prova-escrita-aguardando':'Aguardando resultado da prova escrita','prova-escrita-reprovado':'Reprovado na prova escrita',
+  'conferencia-cobranca':'Conferência de cobrança','teste-volante-resultado':'Resultado teste de volante',
   'ind-contato':'Indicador de Contato por Origem','ind-propostas':'Indicador de Propostas Enviadas',
   'ind-contatos-realizados':'Indicador de Contatos Realizados','ind-aprovados':'Indicador de Aprovados',
   'cad-vendedores':'Cadastro de Vendedores','cad-origens':'Cadastro de Origens',
@@ -1501,14 +1768,22 @@ function goToView(view){
   if(view === 'orcamentos') renderOrcamentos();
   if(view === 'enviados') renderEnviados();
   if(view === 'aprovados') renderAprovados();
+  if(view === 'assinatura-contrato') renderAssinaturaContrato();
+  if(view === 'cobranca-contrato') renderCobrancaContrato();
   if(view === 'exames') renderExames();
   if(view === 'conferencia') renderConferencia();
   if(view === 'alunos-reprovados') renderAlunosReprovados();
   if(view === 'cobranca') renderCobranca();
   if(view === 'aulas') renderAulas();
   if(view === 'agendados') renderAgendados();
+  if(view === 'cobranca-curso') renderCobrancaCurso();
+  if(view === 'prova-escrita-agendamento') renderProvaEscritaAgendamento();
+  if(view === 'prova-escrita-aguardando') renderProvaEscritaAguardando();
+  if(view === 'prova-escrita-reprovado') renderProvaEscritaReprovado();
+  if(view === 'conferencia-cobranca') renderConferenciaCobranca();
   if(view === 'teste-pratico') renderTestePratico();
   if(view === 'resultado-teste') renderResultadoTeste();
+  if(view === 'teste-volante-resultado') renderTesteVolanteResultado();
   if(view === 'clientes-aprovados') renderClientesAprovados();
   if(view === 'cad-vendedores') renderCadastroSimples('vendedores');
   if(view === 'cad-origens') renderCadastroSimples('origens');
@@ -1633,7 +1908,7 @@ async function renderDashboard(){
   const pctValor = totalValor>0 ? (aprovValor/totalValor*100) : 0;
 
   grid.innerHTML = `
-    <div class="stat-card"><div class="label">Orçamentos em Aberto</div><div class="value">${countAbertos||0}</div></div>
+    <div class="stat-card"><div class="label">Leads em Aberto</div><div class="value">${countAbertos||0}</div></div>
     <div class="stat-card yellow"><div class="label">Aguardando Cliente</div><div class="value">${countAguardando||0}</div></div>
     <div class="stat-card green"><div class="label">Aprovados no Período</div><div class="value">${aprovQtd}</div></div>
     <div class="stat-card"><div class="label">Valor Aprovado no Período</div><div class="value">${fmtMoney(aprovValor)}</div></div>
@@ -1642,7 +1917,7 @@ async function renderDashboard(){
   destroyChart('qtd');
   state.charts.qtd = new Chart(document.getElementById('chartQtd'), {
     type: 'bar',
-    data: { labels: ['Orçamentos', 'Aprovados'], datasets: [{ data: [totalQtd, aprovQtd], backgroundColor: ['#1477a8','#1f9d55'], borderRadius:5 }] },
+    data: { labels: ['Leads', 'Aprovados'], datasets: [{ data: [totalQtd, aprovQtd], backgroundColor: ['#1477a8','#1f9d55'], borderRadius:5 }] },
     options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ precision:0, font:{size:10} } }, x:{ ticks:{ font:{size:10} } } } }
   });
   const miniQtdTitle = document.getElementById('miniQtdTitle');
@@ -1651,7 +1926,7 @@ async function renderDashboard(){
   destroyChart('valor');
   state.charts.valor = new Chart(document.getElementById('chartValor'), {
     type: 'bar',
-    data: { labels: ['Orçamentos', 'Aprovados'], datasets: [{ data: [totalValor, aprovValor], backgroundColor: ['#1477a8','#1f9d55'], borderRadius:5 }] },
+    data: { labels: ['Leads', 'Aprovados'], datasets: [{ data: [totalValor, aprovValor], backgroundColor: ['#1477a8','#1f9d55'], borderRadius:5 }] },
     options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ callback:(v)=>fmtMoney(v), font:{size:9} } }, x:{ ticks:{ font:{size:10} } } } }
   });
   const miniValorTitle = document.getElementById('miniValorTitle');
@@ -1685,6 +1960,52 @@ async function renderDashboard(){
   renderGauge('gaugePropostas', 'gaugeProp', gaugeProp.pct, gaugeProp.real, gaugeProp.meta, 'gaugePropostasMeta');
   renderGauge('gaugeContatos', 'gaugeCont', gaugeCont.pct, gaugeCont.real, gaugeCont.meta, 'gaugeContatosMeta');
   renderGauge('gaugeAprovados', 'gaugeAprov', gaugeAprov.pct, gaugeAprov.real, gaugeAprov.meta, 'gaugeAprovadosMeta');
+
+  await renderFunilEtapas();
+}
+
+const FUNIL_ETAPAS = [
+  { label:'Leads', filtro:q=>q.eq('situacao','Aberto') },
+  { label:'Orçamento enviado', filtro:q=>q.eq('situacao','Enviado ao Cliente').eq('situacao_cliente','Aguardando Cliente') },
+  { label:'Aprovados', filtro:q=>q.eq('situacao_cliente','Aprovado').is('etapa', null) },
+  { label:'Assinatura de contrato', filtro:q=>q.eq('etapa','assinatura_contrato') },
+  { label:'Cobrança (contrato)', filtro:q=>q.eq('etapa','cobranca_contrato') },
+  { label:'Exame médico e psico', filtro:q=>q.eq('etapa','exames') },
+  { label:'Conferência de resultados', filtro:q=>q.eq('etapa','conferencia') },
+  { label:'Reprovado no psico/médico', filtro:q=>q.eq('etapa','reprovados') },
+  { label:'Cobrança', filtro:q=>q.eq('etapa','cobranca') },
+  { label:'Curso teórico', filtro:q=>q.eq('etapa','aulas') },
+  { label:'Curso teórico concluído', filtro:q=>q.eq('etapa','agendados') },
+  { label:'Cobrança (curso)', filtro:q=>q.eq('etapa','cobranca_curso') },
+  { label:'Agend. prova escrita', filtro:q=>q.eq('etapa','prova_escrita_agendamento') },
+  { label:'Aguardando result. prova', filtro:q=>q.eq('etapa','prova_escrita_aguardando') },
+  { label:'Reprovado na prova escrita', filtro:q=>q.eq('etapa','prova_escrita_reprovado') },
+  { label:'Conferência de cobrança', filtro:q=>q.eq('etapa','conferencia_cobranca') },
+  { label:'Agend. aulas práticas', filtro:q=>q.eq('etapa','teste_pratico') },
+  { label:'Agend. teste de volante', filtro:q=>q.eq('etapa','resultado_teste') },
+  { label:'Resultado teste de volante', filtro:q=>q.eq('etapa','teste_volante_resultado') },
+  { label:'Alunos aprovados', filtro:q=>q.eq('etapa','aprovado_final') }
+];
+async function renderFunilEtapas(){
+  const counts = await Promise.all(FUNIL_ETAPAS.map(async (fase)=>{
+    let query = sb.from('orcamentos').select('*',{count:'exact',head:true});
+    query = fase.filtro(query);
+    const { count, error } = await query;
+    if(error){ console.error('Erro ao contar etapa '+fase.label, error); return 0; }
+    return count || 0;
+  }));
+  destroyChart('funil');
+  const bg = FUNIL_ETAPAS.map(f => (f.label==='Reprovado no psico/médico' || f.label==='Reprovado na prova escrita') ? '#d64545' : (f.label==='Alunos aprovados' ? '#1f9d55' : '#1477a8'));
+  state.charts.funil = new Chart(document.getElementById('chartFunil'), {
+    type: 'bar',
+    data: { labels: FUNIL_ETAPAS.map(f=>f.label), datasets: [{ data: counts, backgroundColor: bg, borderRadius:4 }] },
+    options: {
+      indexAxis: 'y',
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:(c)=> c.parsed.x + ' aluno' + (c.parsed.x===1?'':'s') } } },
+      scales:{ x:{ beginAtZero:true, ticks:{ precision:0, font:{size:10} } }, y:{ ticks:{ font:{size:10.5} } } }
+    }
+  });
 }
 
 async function computeGaugeData(indicador, dataField, filtroFn){
@@ -1776,7 +2097,7 @@ function drawOrcamentosTable(){
 
   const tbody = document.getElementById('orcTableBody');
   if(rows.length === 0){
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="12">Nenhum orçamento encontrado.</td></tr>`;
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="13">Nenhum orçamento encontrado.</td></tr>`;
     return;
   }
   tbody.innerHTML = rows.map(o=>`
@@ -1791,6 +2112,7 @@ function drawOrcamentosTable(){
       <td>${o.origem?.nome||'—'}</td>
       <td>${o.vendedor?.nome||'—'}</td>
       <td>${situacaoSelectHtml(o)}</td>
+      <td>${leadTimeCell(o.data_abertura || o.created_at)}</td>
       <td>${firstFollowupCell(o)}</td>
       <td class="row-actions">
         <button title="Ligações / Follow-up" data-followup="${o.id}">
@@ -1837,14 +2159,14 @@ function aulasBreakdownCell(o){
 function situacaoBadge(sit){
   if(sit==='Aberto') return '<span class="badge badge-blue">Aberto</span>';
   if(sit==='Reprovado') return '<span class="badge badge-red">Reprovado</span>';
-  if(sit==='Enviado ao Cliente') return '<span class="badge badge-yellow">Enviado ao Cliente</span>';
+  if(sit==='Enviado ao Cliente') return '<span class="badge badge-yellow">Orçamento enviado</span>';
   return `<span class="badge badge-gray">${sit||'—'}</span>`;
 }
 function situacaoSelectHtml(o){
   const cls = o.situacao==='Reprovado' ? 'sit-reprovado' : (o.situacao==='Enviado ao Cliente' ? 'sit-enviado' : 'sit-aberto');
   return `<select class="inline-select ${cls}" data-situacao-select="${o.id}">
     <option value="Aberto" ${o.situacao==='Aberto'?'selected':''}>Aberto</option>
-    <option value="Enviado ao Cliente" ${o.situacao==='Enviado ao Cliente'?'selected':''}>Enviado ao Cliente</option>
+    <option value="Enviado ao Cliente" ${o.situacao==='Enviado ao Cliente'?'selected':''}>Orçamento enviado</option>
     <option value="Reprovado" ${o.situacao==='Reprovado'?'selected':''}>Reprovado</option>
   </select>`;
 }
@@ -1859,7 +2181,7 @@ async function quickChangeSituacao(id, novaSituacao){
     return;
   }
   if(novaSituacao === 'Enviado ao Cliente'){
-    if(!confirm('Enviar este orçamento ao cliente? Ele sairá da lista de Orçamentos e passará para "Enviado ao Cliente".')){
+    if(!confirm('Enviar este orçamento ao cliente? Ele sairá da lista de Leads e passará para "Orçamento enviado".')){
       drawOrcamentosTable();
       return;
     }
@@ -1879,7 +2201,7 @@ async function updateSituacaoRapida(id, payload){
   renderOrcamentos();
 }
 
-/* Alteração rápida da situação do cliente (telas Enviado ao Cliente / Aprovados) */
+/* Alteração rápida da situação do cliente (telas Orçamento enviado / Aprovados) */
 async function quickChangeSituacaoCliente(id, novaSituacao){
   const o = state.enviados.find(x=>x.id===id) || state.aprovados.find(x=>x.id===id);
   if(!o || novaSituacao === o.situacao_cliente) return;
@@ -1961,7 +2283,7 @@ function updateOrcCarteiraUI(){
 
 function openOrcamentoModal(id){
   const editing = !!id;
-  document.getElementById('modalOrcamentoTitle').textContent = editing ? 'Editar Orçamento' : 'Novo Orçamento';
+  document.getElementById('modalOrcamentoTitle').textContent = editing ? 'Editar Lead' : 'Novo Lead';
   document.getElementById('orcId').value = id || '';
   if(editing){
     const o = state.orcamentos.find(x=>x.id===id);
@@ -2230,7 +2552,7 @@ function drawEnviadosTable(){
   });
   const tbody = document.getElementById('envTableBody');
   if(rows.length===0){
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="10">Nenhum orçamento enviado ao cliente ainda.</td></tr>`;
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="11">Nenhum orçamento enviado ao cliente ainda.</td></tr>`;
     return;
   }
   tbody.innerHTML = rows.map(o=>`
@@ -2243,6 +2565,7 @@ function drawEnviadosTable(){
       <td>${o.vendedor?.nome||'—'}</td>
       <td>${situacaoClienteSelectHtml(o)}</td>
       <td>${fmtDate(o.data_aprovacao)}</td>
+      <td>${leadTimeCell(o.data_envio)}</td>
       <td>${firstFollowupCell(o)}</td>
       <td class="row-actions">
         <button title="Ligações / Follow-up" data-followup="${o.id}">
@@ -2251,7 +2574,7 @@ function drawEnviadosTable(){
         <button title="Editar" data-editenv="${o.id}">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
         </button>
-        <button title="Voltar para Orçamentos (desfazer envio)" class="danger" data-revert="${o.id}">
+        <button title="Voltar para Leads (desfazer envio)" class="danger" data-revert="${o.id}">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
         </button>
       </td>
@@ -2265,7 +2588,7 @@ function drawEnviadosTable(){
   });
 }
 async function revertEnviado(id){
-  if(!confirm('Voltar este orçamento para a lista de Orçamentos? Isso desfaz o envio ao cliente e apaga a situação/aprovação registradas nesta etapa.')) return;
+  if(!confirm('Voltar este orçamento para a lista de Leads? Isso desfaz o envio ao cliente e apaga a situação/aprovação registradas nesta etapa.')) return;
   const payload = {
     situacao: 'Aberto',
     situacao_cliente: null,
@@ -2278,7 +2601,7 @@ async function revertEnviado(id){
   };
   const { error } = await sb.from('orcamentos').update(payload).eq('id', id);
   if(error){ showToast('Erro ao reverter: '+error.message, true); return; }
-  showToast('Orçamento retornado para a lista de Orçamentos.');
+  showToast('Orçamento retornado para a lista de Leads.');
   renderEnviados();
 }
 function clienteSitBadge(sit){
@@ -2371,7 +2694,7 @@ function drawAprovadosTable(){
   });
   const tbody = document.getElementById('aprTableBody');
   if(rows.length===0){
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="11">Nenhum orçamento aprovado ainda.</td></tr>`;
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="12">Nenhum orçamento aprovado ainda.</td></tr>`;
     return;
   }
   tbody.innerHTML = rows.map(o=>`
@@ -2384,6 +2707,7 @@ function drawAprovadosTable(){
       <td>${o.vendedor?.nome||'—'}</td>
       <td>${situacaoClienteSelectHtml(o)}</td>
       <td>${etapaCell(o)}</td>
+      <td>${leadTimeCell(o.etapa ? (o.etapa_entrada||o.updated_at) : o.data_aprovacao)}</td>
       <td>${firstFollowupCell(o)}</td>
       <td>${fmtDate(o.data_fechamento)}</td>
       <td class="row-actions">
@@ -2393,7 +2717,7 @@ function drawAprovadosTable(){
         <button title="Editar" data-editenv="${o.id}">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
         </button>
-        ${o.etapa ? '' : `<button class="btn btn-sm btn-yellow" data-enviar-exame="${o.id}">Enviar para Exames</button>`}
+        ${o.etapa ? '' : `<button class="btn btn-sm btn-yellow" data-enviar-exame="${o.id}">Enviar para Assinatura de Contrato</button>`}
       </td>
     </tr>
   `).join('');
@@ -2402,19 +2726,23 @@ function drawAprovadosTable(){
   tbody.querySelectorAll('[data-situacao-cliente-select]').forEach(sel=>{
     sel.addEventListener('change', (e)=> quickChangeSituacaoCliente(sel.dataset.situacaoClienteSelect, e.target.value));
   });
-  tbody.querySelectorAll('[data-enviar-exame]').forEach(b=> b.addEventListener('click', ()=> enviarParaExames(b.dataset.enviarExame)));
+  tbody.querySelectorAll('[data-enviar-exame]').forEach(b=> b.addEventListener('click', ()=> enviarParaAssinaturaContrato(b.dataset.enviarExame)));
 }
 const ETAPA_LABELS = {
-  exames:'Exames', conferencia:'Conferência', reprovados:'Alunos Reprovados', cobranca:'Cobrança',
-  aulas:'Agend. Aulas', agendados:'Alunos Agendados', teste_pratico:'Agend. Teste', resultado_teste:'Resultado Teste',
-  aprovado_final:'Concluído'
+  assinatura_contrato:'Assinatura de contrato', cobranca_contrato:'Cobrança',
+  exames:'Exame médico e psico', conferencia:'Conferência', reprovados:'Reprovado no psico/médico', cobranca:'Cobrança',
+  aulas:'Curso teórico', agendados:'Curso teórico concluído', cobranca_curso:'Cobrança',
+  prova_escrita_agendamento:'Agend. prova escrita', prova_escrita_aguardando:'Aguardando result. prova',
+  prova_escrita_reprovado:'Reprovado na prova escrita', conferencia_cobranca:'Conferência de cobrança',
+  teste_pratico:'Agend. aulas práticas', resultado_teste:'Agend. teste de volante',
+  teste_volante_resultado:'Resultado teste de volante', aprovado_final:'Concluído'
 };
 function etapaCell(o){
   if(!o.etapa) return '<span class="badge badge-gray">Não iniciado</span>';
   return `<span class="badge badge-blue">${ETAPA_LABELS[o.etapa]||o.etapa}</span>`;
 }
-async function enviarParaExames(id){
-  await updatePipeline(id, { etapa:'exames', situacao_etapa:'Em Andamento' }, [renderAprovados, renderExames]);
+async function enviarParaAssinaturaContrato(id){
+  await updatePipeline(id, { etapa:'assinatura_contrato', situacao_etapa:'Em Andamento' }, [renderAprovados, renderAssinaturaContrato]);
 }
 ['aprSearch','aprFiltroOrigem'].forEach(id=>{
   document.getElementById(id).addEventListener('input', drawAprovadosTable);
@@ -2428,10 +2756,26 @@ const ICON_PHONE = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" 
 
 async function updatePipeline(id, payload, refreshFns){
   payload.updated_at = new Date().toISOString();
+  if('etapa' in payload){ payload.etapa_entrada = payload.updated_at; }
   const { error } = await sb.from('orcamentos').update(payload).eq('id', id);
   if(error){ showToast('Erro ao atualizar: '+error.message, true); }
   else showToast('Atualizado com sucesso.');
   for(const fn of (refreshFns||[])){ await fn(); }
+}
+
+/* ---------- Lead time (dias na etapa atual) ---------- */
+function leadTimeDias(dateStr){
+  if(!dateStr) return null;
+  const d = new Date(dateStr);
+  if(isNaN(d.getTime())) return null;
+  const diffMs = Date.now() - d.getTime();
+  return Math.max(0, Math.floor(diffMs / 86400000));
+}
+function leadTimeCell(dateStr){
+  const dias = leadTimeDias(dateStr);
+  if(dias === null) return '<span class="muted small">—</span>';
+  const cls = dias >= 10 ? 'badge-red' : (dias >= 5 ? 'badge-yellow' : 'badge-gray');
+  return `<span class="badge ${cls}">${dias} dia${dias===1?'':'s'}</span>`;
 }
 function simpleSelectHtml(o, options, dataAttr, colorMap, defaultVal){
   const val = o.situacao_etapa || defaultVal || options[0];
@@ -2444,6 +2788,81 @@ function pendenteBadge(feito, textoFeito, textoPendente){
   return feito ? `<span class="badge badge-green">${textoFeito}</span>` : `<span class="badge badge-gray">${textoPendente||'Pendente'}</span>`;
 }
 
+/* ---------- 0a) ASSINATURA DE CONTRATO ---------- */
+async function fetchAssinaturaContrato(){
+  const { data, error } = await sb.from('orcamentos').select('*, vendedor:vendedores(id,nome)').eq('etapa','assinatura_contrato').order('updated_at',{ascending:false});
+  if(error){ showToast('Erro ao carregar: '+error.message, true); return []; }
+  return data || [];
+}
+async function renderAssinaturaContrato(){ state.assinaturaContrato = await fetchAssinaturaContrato(); drawAssinaturaContratoTable(); }
+function drawAssinaturaContratoTable(){
+  const search = document.getElementById('assContSearch').value.toLowerCase();
+  const rows = state.assinaturaContrato.filter(o => !search || (o.cliente||'').toLowerCase().includes(search));
+  const tbody = document.getElementById('assContTableBody');
+  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="8">Nenhum aluno nesta etapa.</td></tr>`; return; }
+  tbody.innerHTML = rows.map(o=>`
+    <tr>
+      <td>${o.cliente||''}</td><td>${o.whatsapp||'—'}</td><td>${fmtMoney(o.valor)}</td><td>${o.vendedor?.nome||'—'}</td>
+      <td>${simpleSelectHtml(o, ['Em Andamento','Concluído'], 'asscont-select', {'Em Andamento':'sit-enviado','Concluído':'sit-aprovado'})}</td>
+      <td>${leadTimeCell(o.etapa_entrada||o.updated_at)}</td>
+      <td>${firstFollowupCell(o)}</td>
+      <td class="row-actions"><button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button></td>
+    </tr>
+  `).join('');
+  tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-asscont-select]').forEach(sel=> sel.addEventListener('change', (e)=> quickChangeAssinaturaContrato(sel.dataset.asscontSelect, e.target.value)));
+}
+document.getElementById('assContSearch').addEventListener('input', drawAssinaturaContratoTable);
+async function quickChangeAssinaturaContrato(id, novoValor){
+  if(novoValor === 'Concluído'){
+    if(!confirm('Marcar como concluído? O aluno seguirá para a Cobrança.')){ drawAssinaturaContratoTable(); return; }
+    await updatePipeline(id, { etapa:'cobranca_contrato', situacao_etapa:null, data_assinatura_contrato: todayISO() }, [renderAssinaturaContrato, renderCobrancaContrato]);
+  } else {
+    await updatePipeline(id, { situacao_etapa:'Em Andamento' }, [renderAssinaturaContrato]);
+  }
+}
+
+/* ---------- 0b) COBRANÇA (CONTRATO) ---------- */
+async function fetchCobrancaContrato(){
+  const { data, error } = await sb.from('orcamentos').select('*').eq('etapa','cobranca_contrato').order('updated_at',{ascending:false});
+  if(error){ showToast('Erro ao carregar: '+error.message, true); return []; }
+  return data || [];
+}
+async function renderCobrancaContrato(){ state.cobrancaContrato = await fetchCobrancaContrato(); drawCobrancaContratoTable(); }
+function drawCobrancaContratoTable(){
+  const search = document.getElementById('cobContSearch').value.toLowerCase();
+  const rows = state.cobrancaContrato.filter(o => !search || (o.cliente||'').toLowerCase().includes(search));
+  const tbody = document.getElementById('cobContTableBody');
+  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="6">Nenhum aluno nesta etapa.</td></tr>`; return; }
+  tbody.innerHTML = rows.map(o=>`
+    <tr>
+      <td>${o.cliente||''}</td><td>${o.whatsapp||'—'}</td><td>${fmtMoney(o.valor)}</td>
+      <td>${pendenteBadge(!!o.data_pagamento_contrato, 'Pago')}</td>
+      <td>${leadTimeCell(o.etapa_entrada||o.updated_at)}</td>
+      <td class="row-actions">
+        <button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button>
+        ${o.data_pagamento_contrato ? '' : `<button class="btn btn-sm btn-yellow" data-pagar="${o.id}">Marcar como Pago</button>`}
+      </td>
+    </tr>
+  `).join('');
+  tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-pagar]').forEach(b=> b.addEventListener('click', ()=> openPagamentoContratoModal(b.dataset.pagar)));
+}
+document.getElementById('cobContSearch').addEventListener('input', drawCobrancaContratoTable);
+function openPagamentoContratoModal(id){
+  document.getElementById('pagContOrcId').value = id;
+  document.getElementById('pagContData').value = todayISO();
+  document.getElementById('pagContForma').value = 'Pix';
+  openModal('modalPagamentoContrato');
+}
+document.getElementById('btnConfirmarPagamentoContrato').addEventListener('click', async ()=>{
+  const id = document.getElementById('pagContOrcId').value;
+  const data_pagamento_contrato = document.getElementById('pagContData').value || todayISO();
+  const forma_pagamento_contrato = document.getElementById('pagContForma').value;
+  await updatePipeline(id, { etapa:'exames', situacao_etapa:'Em Andamento', data_pagamento_contrato, forma_pagamento_contrato }, [renderCobrancaContrato, renderExames]);
+  closeModal('modalPagamentoContrato');
+});
+
 /* ---------- 1) EXAMES ---------- */
 async function fetchExames(){
   const { data, error } = await sb.from('orcamentos').select('*, vendedor:vendedores(id,nome)').eq('etapa','exames').order('data_aprovacao',{ascending:false});
@@ -2455,11 +2874,12 @@ function drawExamesTable(){
   const search = document.getElementById('exaSearch').value.toLowerCase();
   const rows = state.exames.filter(o => !search || (o.cliente||'').toLowerCase().includes(search));
   const tbody = document.getElementById('exaTableBody');
-  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="7">Nenhum aluno nesta etapa.</td></tr>`; return; }
+  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="8">Nenhum aluno nesta etapa.</td></tr>`; return; }
   tbody.innerHTML = rows.map(o=>`
     <tr>
       <td>${o.cliente||''}</td><td>${o.whatsapp||'—'}</td><td>${fmtMoney(o.valor)}</td><td>${o.vendedor?.nome||'—'}</td>
       <td>${simpleSelectHtml(o, ['Em Andamento','Concluído'], 'exame-select', {'Em Andamento':'sit-enviado','Concluído':'sit-aprovado'})}</td>
+      <td>${leadTimeCell(o.etapa_entrada||o.updated_at)}</td>
       <td>${firstFollowupCell(o)}</td>
       <td class="row-actions"><button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button></td>
     </tr>
@@ -2488,12 +2908,13 @@ function drawConferenciaTable(){
   const search = document.getElementById('confSearch').value.toLowerCase();
   const rows = state.conferencia.filter(o => !search || (o.cliente||'').toLowerCase().includes(search));
   const tbody = document.getElementById('confTableBody');
-  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="6">Nenhum aluno nesta etapa.</td></tr>`; return; }
+  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="7">Nenhum aluno nesta etapa.</td></tr>`; return; }
   tbody.innerHTML = rows.map(o=>`
     <tr>
       <td>${o.cliente||''}</td><td>${o.whatsapp||'—'}</td><td>${o.vendedor?.nome||'—'}</td>
       <td>${simpleSelectHtml(o, ['Em Andamento','Aprovado','Reprovado'], 'conf-select', {'Em Andamento':'sit-enviado','Aprovado':'sit-aprovado','Reprovado':'sit-reprovado'})}</td>
       <td>${o.motivo_reprovacao_exame || '—'}</td>
+      <td>${leadTimeCell(o.etapa_entrada||o.updated_at)}</td>
       <td class="row-actions"><button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button></td>
     </tr>
   `).join('');
@@ -2536,11 +2957,12 @@ function drawAlunosReprovadosTable(){
   const search = document.getElementById('reprSearch').value.toLowerCase();
   const rows = state.alunosReprovados.filter(o => !search || (o.cliente||'').toLowerCase().includes(search));
   const tbody = document.getElementById('reprTableBody');
-  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="5">Nenhum aluno nesta etapa.</td></tr>`; return; }
+  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="6">Nenhum aluno nesta etapa.</td></tr>`; return; }
   tbody.innerHTML = rows.map(o=>`
     <tr>
       <td>${o.cliente||''}</td><td>${o.whatsapp||'—'}</td><td>${o.motivo_reprovacao_exame||'—'}</td>
       <td>${simpleSelectHtml(o, ['Em Andamento','Concluído'], 'repr-select', {'Em Andamento':'sit-enviado','Concluído':'sit-aprovado'})}</td>
+      <td>${leadTimeCell(o.etapa_entrada||o.updated_at)}</td>
       <td class="row-actions"><button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button></td>
     </tr>
   `).join('');
@@ -2568,11 +2990,12 @@ function drawCobrancaTable(){
   const search = document.getElementById('cobSearch').value.toLowerCase();
   const rows = state.cobranca.filter(o => !search || (o.cliente||'').toLowerCase().includes(search));
   const tbody = document.getElementById('cobTableBody');
-  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="5">Nenhum aluno nesta etapa.</td></tr>`; return; }
+  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="6">Nenhum aluno nesta etapa.</td></tr>`; return; }
   tbody.innerHTML = rows.map(o=>`
     <tr>
       <td>${o.cliente||''}</td><td>${o.whatsapp||'—'}</td><td>${fmtMoney(o.valor)}</td>
       <td>${pendenteBadge(!!o.data_pagamento, 'Pago')}</td>
+      <td>${leadTimeCell(o.etapa_entrada||o.updated_at)}</td>
       <td class="row-actions">
         <button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button>
         ${o.data_pagamento ? '' : `<button class="btn btn-sm btn-yellow" data-pagar="${o.id}">Marcar como Pago</button>`}
@@ -2608,13 +3031,14 @@ function drawAulasTable(){
   const search = document.getElementById('aulSearch').value.toLowerCase();
   const rows = state.aulas.filter(o => !search || (o.cliente||'').toLowerCase().includes(search));
   const tbody = document.getElementById('aulTableBody');
-  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="6">Nenhum aluno nesta etapa.</td></tr>`; return; }
+  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="7">Nenhum aluno nesta etapa.</td></tr>`; return; }
   tbody.innerHTML = rows.map(o=>`
     <tr>
       <td>${o.cliente||''}</td><td>${o.whatsapp||'—'}</td>
       <td>${carteiraBadge(o.carteira)}</td>
       <td>${aulasBreakdownCell(o)}</td>
       <td>${pendenteBadge(!!o.data_aula_agendada, 'Agendado')}</td>
+      <td>${leadTimeCell(o.etapa_entrada||o.updated_at)}</td>
       <td class="row-actions">
         <button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button>
         <button class="btn btn-sm btn-yellow" data-agendar="${o.id}">Agendar</button>
@@ -2685,11 +3109,12 @@ function drawAgendadosTable(){
     return true;
   });
   const tbody = document.getElementById('agdTableBody');
-  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="6">Nenhum aluno agendado encontrado.</td></tr>`; return; }
+  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="7">Nenhum aluno agendado encontrado.</td></tr>`; return; }
   tbody.innerHTML = rows.map(o=>`
     <tr>
       <td>${o.cliente||''}</td><td>${o.turma||'—'}</td><td>${fmtDate(o.data_aula_agendada)}</td><td>${o.numero_aulas||0}</td>
       <td>${simpleSelectHtml(o, ['Pendente','Aprovado','Reprovado'], 'agd-select', {'Pendente':'sit-aberto','Aprovado':'sit-aprovado','Reprovado':'sit-reprovado'}, 'Pendente')}</td>
+      <td>${leadTimeCell(o.etapa_entrada||o.updated_at)}</td>
       <td class="row-actions"><button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button></td>
     </tr>
   `).join('');
@@ -2698,19 +3123,204 @@ function drawAgendadosTable(){
 }
 async function quickChangeAgendado(id, novoValor){
   if(novoValor === 'Reprovado'){
-    if(!confirm('Marcar como reprovado? O aluno voltará para o Agendamento de Aulas para reagendar.')){ drawAgendadosTable(); return; }
+    if(!confirm('Marcar como reprovado? O aluno voltará para o Curso Teórico para reagendar.')){ drawAgendadosTable(); return; }
     await updatePipeline(id, { etapa:'aulas', situacao_etapa:null, data_aula_agendada:null, turma:null }, [renderAgendados, renderAulas]);
     return;
   }
   if(novoValor === 'Aprovado'){
-    if(!confirm('Marcar como aprovado? O aluno seguirá para o Agendamento de Teste Prático.')){ drawAgendadosTable(); return; }
-    await updatePipeline(id, { etapa:'teste_pratico', situacao_etapa:null }, [renderAgendados, renderTestePratico]);
+    if(!confirm('Marcar como aprovado? O aluno seguirá para a Cobrança.')){ drawAgendadosTable(); return; }
+    await updatePipeline(id, { etapa:'cobranca_curso', situacao_etapa:null }, [renderAgendados, renderCobrancaCurso]);
     return;
   }
   await updatePipeline(id, { situacao_etapa:null }, [renderAgendados]);
 }
 
-/* ---------- 7) AGENDAMENTO DE TESTE PRÁTICO ---------- */
+/* ---------- 6b) COBRANÇA (CURSO) ---------- */
+async function fetchCobrancaCurso(){
+  const { data, error } = await sb.from('orcamentos').select('*').eq('etapa','cobranca_curso').order('updated_at',{ascending:false});
+  if(error){ showToast('Erro ao carregar: '+error.message, true); return []; }
+  return data || [];
+}
+async function renderCobrancaCurso(){ state.cobrancaCurso = await fetchCobrancaCurso(); drawCobrancaCursoTable(); }
+function drawCobrancaCursoTable(){
+  const search = document.getElementById('cobCursoSearch').value.toLowerCase();
+  const rows = state.cobrancaCurso.filter(o => !search || (o.cliente||'').toLowerCase().includes(search));
+  const tbody = document.getElementById('cobCursoTableBody');
+  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="6">Nenhum aluno nesta etapa.</td></tr>`; return; }
+  tbody.innerHTML = rows.map(o=>`
+    <tr>
+      <td>${o.cliente||''}</td><td>${o.whatsapp||'—'}</td><td>${fmtMoney(o.valor)}</td>
+      <td>${pendenteBadge(!!o.data_pagamento_curso, 'Pago')}</td>
+      <td>${leadTimeCell(o.etapa_entrada||o.updated_at)}</td>
+      <td class="row-actions">
+        <button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button>
+        ${o.data_pagamento_curso ? '' : `<button class="btn btn-sm btn-yellow" data-pagar="${o.id}">Marcar como Pago</button>`}
+      </td>
+    </tr>
+  `).join('');
+  tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-pagar]').forEach(b=> b.addEventListener('click', ()=> openPagamentoCursoModal(b.dataset.pagar)));
+}
+document.getElementById('cobCursoSearch').addEventListener('input', drawCobrancaCursoTable);
+function openPagamentoCursoModal(id){
+  document.getElementById('pagCursoOrcId').value = id;
+  document.getElementById('pagCursoData').value = todayISO();
+  document.getElementById('pagCursoForma').value = 'Pix';
+  openModal('modalPagamentoCurso');
+}
+document.getElementById('btnConfirmarPagamentoCurso').addEventListener('click', async ()=>{
+  const id = document.getElementById('pagCursoOrcId').value;
+  const data_pagamento_curso = document.getElementById('pagCursoData').value || todayISO();
+  const forma_pagamento_curso = document.getElementById('pagCursoForma').value;
+  await updatePipeline(id, { etapa:'prova_escrita_agendamento', situacao_etapa:null, data_pagamento_curso, forma_pagamento_curso }, [renderCobrancaCurso, renderProvaEscritaAgendamento]);
+  closeModal('modalPagamentoCurso');
+});
+
+/* ---------- 6c) AGENDAMENTO DE PROVA ESCRITA ---------- */
+async function fetchProvaEscritaAgendamento(){
+  const { data, error } = await sb.from('orcamentos').select('*').eq('etapa','prova_escrita_agendamento').order('updated_at',{ascending:false});
+  if(error){ showToast('Erro ao carregar: '+error.message, true); return []; }
+  return data || [];
+}
+async function renderProvaEscritaAgendamento(){ state.provaEscritaAgendamento = await fetchProvaEscritaAgendamento(); drawProvaEscritaAgendamentoTable(); }
+function drawProvaEscritaAgendamentoTable(){
+  const search = document.getElementById('provaAgSearch').value.toLowerCase();
+  const rows = state.provaEscritaAgendamento.filter(o => !search || (o.cliente||'').toLowerCase().includes(search));
+  const tbody = document.getElementById('provaAgTableBody');
+  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="5">Nenhum aluno nesta etapa.</td></tr>`; return; }
+  tbody.innerHTML = rows.map(o=>`
+    <tr>
+      <td>${o.cliente||''}</td><td>${o.whatsapp||'—'}</td>
+      <td>${pendenteBadge(!!o.data_prova_escrita, 'Agendado')}</td>
+      <td>${leadTimeCell(o.etapa_entrada||o.updated_at)}</td>
+      <td class="row-actions">
+        <button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button>
+        <button class="btn btn-sm btn-yellow" data-agendar="${o.id}">Agendar</button>
+      </td>
+    </tr>
+  `).join('');
+  tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-agendar]').forEach(b=> b.addEventListener('click', ()=> openAgendarProvaModal(b.dataset.agendar)));
+}
+document.getElementById('provaAgSearch').addEventListener('input', drawProvaEscritaAgendamentoTable);
+function openAgendarProvaModal(id){
+  const o = state.provaEscritaAgendamento.find(x=>x.id===id);
+  document.getElementById('provaOrcId').value = id;
+  document.getElementById('provaData').value = o?.data_prova_escrita || todayISO();
+  document.getElementById('provaHora').value = o?.hora_prova_escrita || '09:00';
+  openModal('modalAgendarProva');
+}
+document.getElementById('btnConfirmarAgendaProva').addEventListener('click', async ()=>{
+  const id = document.getElementById('provaOrcId').value;
+  const data_prova_escrita = document.getElementById('provaData').value || todayISO();
+  const hora_prova_escrita = document.getElementById('provaHora').value || null;
+  await updatePipeline(id, { etapa:'prova_escrita_aguardando', situacao_etapa:'Pendente', data_prova_escrita, hora_prova_escrita }, [renderProvaEscritaAgendamento, renderProvaEscritaAguardando]);
+  closeModal('modalAgendarProva');
+});
+
+/* ---------- 6d) AGUARDANDO RESULTADO DA PROVA ESCRITA ---------- */
+async function fetchProvaEscritaAguardando(){
+  const { data, error } = await sb.from('orcamentos').select('*').eq('etapa','prova_escrita_aguardando').order('data_prova_escrita',{ascending:false});
+  if(error){ showToast('Erro ao carregar: '+error.message, true); return []; }
+  return data || [];
+}
+async function renderProvaEscritaAguardando(){ state.provaEscritaAguardando = await fetchProvaEscritaAguardando(); drawProvaEscritaAguardandoTable(); }
+function drawProvaEscritaAguardandoTable(){
+  const search = document.getElementById('provaAgdSearch').value.toLowerCase();
+  const rows = state.provaEscritaAguardando.filter(o => !search || (o.cliente||'').toLowerCase().includes(search));
+  const tbody = document.getElementById('provaAgdTableBody');
+  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="6">Nenhum aluno nesta etapa.</td></tr>`; return; }
+  tbody.innerHTML = rows.map(o=>`
+    <tr>
+      <td>${o.cliente||''}</td><td>${fmtDate(o.data_prova_escrita)}</td><td>${o.hora_prova_escrita||'—'}</td>
+      <td>${simpleSelectHtml(o, ['Pendente','Aprovado','Reprovado'], 'provaagd-select', {'Pendente':'sit-aberto','Aprovado':'sit-aprovado','Reprovado':'sit-reprovado'}, 'Pendente')}</td>
+      <td>${leadTimeCell(o.etapa_entrada||o.updated_at)}</td>
+      <td class="row-actions"><button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button></td>
+    </tr>
+  `).join('');
+  tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-provaagd-select]').forEach(sel=> sel.addEventListener('change', (e)=> quickChangeProvaEscritaAguardando(sel.dataset.provaagdSelect, e.target.value)));
+}
+document.getElementById('provaAgdSearch').addEventListener('input', drawProvaEscritaAguardandoTable);
+async function quickChangeProvaEscritaAguardando(id, novoValor){
+  if(novoValor === 'Reprovado'){
+    if(!confirm('Marcar como reprovado? O aluno irá para "Reprovado na Prova Escrita".')){ drawProvaEscritaAguardandoTable(); return; }
+    await updatePipeline(id, { etapa:'prova_escrita_reprovado', situacao_etapa:'Em Andamento' }, [renderProvaEscritaAguardando, renderProvaEscritaReprovado]);
+    return;
+  }
+  if(novoValor === 'Aprovado'){
+    if(!confirm('Marcar como aprovado? O aluno seguirá para a Conferência de Cobrança.')){ drawProvaEscritaAguardandoTable(); return; }
+    await updatePipeline(id, { etapa:'conferencia_cobranca', situacao_etapa:null }, [renderProvaEscritaAguardando, renderConferenciaCobranca]);
+    return;
+  }
+  await updatePipeline(id, { situacao_etapa:'Pendente' }, [renderProvaEscritaAguardando]);
+}
+
+/* ---------- 6e) REPROVADO NA PROVA ESCRITA ---------- */
+async function fetchProvaEscritaReprovado(){
+  const { data, error } = await sb.from('orcamentos').select('*').eq('etapa','prova_escrita_reprovado').order('updated_at',{ascending:false});
+  if(error){ showToast('Erro ao carregar: '+error.message, true); return []; }
+  return data || [];
+}
+async function renderProvaEscritaReprovado(){ state.provaEscritaReprovado = await fetchProvaEscritaReprovado(); drawProvaEscritaReprovadoTable(); }
+function drawProvaEscritaReprovadoTable(){
+  const search = document.getElementById('provaReprSearch').value.toLowerCase();
+  const rows = state.provaEscritaReprovado.filter(o => !search || (o.cliente||'').toLowerCase().includes(search));
+  const tbody = document.getElementById('provaReprTableBody');
+  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="5">Nenhum aluno nesta etapa.</td></tr>`; return; }
+  tbody.innerHTML = rows.map(o=>`
+    <tr>
+      <td>${o.cliente||''}</td><td>${o.whatsapp||'—'}</td>
+      <td>${simpleSelectHtml(o, ['Em Andamento','Reprogramado'], 'provarepr-select', {'Em Andamento':'sit-enviado','Reprogramado':'sit-aprovado'})}</td>
+      <td>${leadTimeCell(o.etapa_entrada||o.updated_at)}</td>
+      <td class="row-actions">
+        <button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button>
+        <button class="btn btn-sm btn-yellow" data-reprogramar="${o.id}">Reprogramar</button>
+      </td>
+    </tr>
+  `).join('');
+  tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-reprogramar]').forEach(b=> b.addEventListener('click', ()=> reprogramarProvaEscrita(b.dataset.reprogramar)));
+}
+document.getElementById('provaReprSearch').addEventListener('input', drawProvaEscritaReprovadoTable);
+async function reprogramarProvaEscrita(id){
+  if(!confirm('Reprogramar? O aluno voltará para "Aguardando Resultado da Prova Escrita".')){ return; }
+  await updatePipeline(id, { etapa:'prova_escrita_aguardando', situacao_etapa:'Pendente' }, [renderProvaEscritaReprovado, renderProvaEscritaAguardando]);
+}
+
+/* ---------- 6f) CONFERÊNCIA DE COBRANÇA ---------- */
+async function fetchConferenciaCobranca(){
+  const { data, error } = await sb.from('orcamentos').select('*').eq('etapa','conferencia_cobranca').order('updated_at',{ascending:false});
+  if(error){ showToast('Erro ao carregar: '+error.message, true); return []; }
+  return data || [];
+}
+async function renderConferenciaCobranca(){ state.conferenciaCobranca = await fetchConferenciaCobranca(); drawConferenciaCobrancaTable(); }
+function drawConferenciaCobrancaTable(){
+  const search = document.getElementById('confCobSearch').value.toLowerCase();
+  const rows = state.conferenciaCobranca.filter(o => !search || (o.cliente||'').toLowerCase().includes(search));
+  const tbody = document.getElementById('confCobTableBody');
+  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="5">Nenhum aluno nesta etapa.</td></tr>`; return; }
+  tbody.innerHTML = rows.map(o=>`
+    <tr>
+      <td>${o.cliente||''}</td><td>${o.whatsapp||'—'}</td>
+      <td>${pendenteBadge(!!o.data_pagamento_curso, 'Pagamento confirmado', 'Sem registro de pagamento')}</td>
+      <td>${leadTimeCell(o.etapa_entrada||o.updated_at)}</td>
+      <td class="row-actions">
+        <button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button>
+        <button class="btn btn-sm btn-yellow" data-confirmar="${o.id}">Enviar para Aulas Práticas</button>
+      </td>
+    </tr>
+  `).join('');
+  tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-confirmar]').forEach(b=> b.addEventListener('click', ()=> confirmarConferenciaCobranca(b.dataset.confirmar)));
+}
+document.getElementById('confCobSearch').addEventListener('input', drawConferenciaCobrancaTable);
+async function confirmarConferenciaCobranca(id){
+  if(!confirm('Confirmar conferência de cobrança? O aluno seguirá para o Agendamento de Aulas Práticas.')){ return; }
+  await updatePipeline(id, { etapa:'teste_pratico', situacao_etapa:null }, [renderConferenciaCobranca, renderTestePratico]);
+}
+
+/* ---------- 7) AGENDAMENTO DE AULAS PRÁTICAS ---------- */
 async function fetchTestePratico(){
   const { data, error } = await sb.from('orcamentos').select('*').eq('etapa','teste_pratico').order('updated_at',{ascending:false});
   if(error){ showToast('Erro ao carregar: '+error.message, true); return []; }
@@ -2721,11 +3331,12 @@ function drawTestePraticoTable(){
   const search = document.getElementById('tstSearch').value.toLowerCase();
   const rows = state.testePratico.filter(o => !search || (o.cliente||'').toLowerCase().includes(search));
   const tbody = document.getElementById('tstTableBody');
-  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="4">Nenhum aluno nesta etapa.</td></tr>`; return; }
+  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="5">Nenhum aluno nesta etapa.</td></tr>`; return; }
   tbody.innerHTML = rows.map(o=>`
     <tr>
       <td>${o.cliente||''}</td><td>${o.whatsapp||'—'}</td>
       <td>${pendenteBadge(!!o.data_teste_pratico, 'Agendado')}</td>
+      <td>${leadTimeCell(o.etapa_entrada||o.updated_at)}</td>
       <td class="row-actions">
         <button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button>
         <button class="btn btn-sm btn-yellow" data-agendar="${o.id}">Agendar</button>
@@ -2751,9 +3362,9 @@ document.getElementById('btnConfirmarAgendaTeste').addEventListener('click', asy
   closeModal('modalAgendarTeste');
 });
 
-/* ---------- 8) RESULTADO DO TESTE ---------- */
+/* ---------- 8) AGENDAMENTO DE TESTE DE VOLANTE ---------- */
 async function fetchResultadoTeste(){
-  const { data, error } = await sb.from('orcamentos').select('*').eq('etapa','resultado_teste').order('data_teste_pratico',{ascending:false});
+  const { data, error } = await sb.from('orcamentos').select('*').eq('etapa','resultado_teste').order('updated_at',{ascending:false});
   if(error){ showToast('Erro ao carregar: '+error.message, true); return []; }
   return data || [];
 }
@@ -2778,42 +3389,85 @@ function drawResultadoTesteTable(){
   const fAno = document.getElementById('resFiltroAno').value;
   const rows = state.resultadoTeste.filter(o=>{
     if(search && !(o.cliente||'').toLowerCase().includes(search)) return false;
-    if(o.data_teste_pratico){
-      const [y,m] = o.data_teste_pratico.split('-');
+    if(o.data_teste_volante){
+      const [y,m] = o.data_teste_volante.split('-');
       if(fMes && Number(m) !== Number(fMes)) return false;
       if(fAno && Number(y) !== Number(fAno)) return false;
     } else if(fMes || fAno) return false;
     return true;
   });
   const tbody = document.getElementById('resTableBody');
-  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="5">Nenhum resultado encontrado.</td></tr>`; return; }
+  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="5">Nenhum aluno nesta etapa.</td></tr>`; return; }
   tbody.innerHTML = rows.map(o=>`
     <tr>
-      <td>${o.cliente||''}</td><td>${fmtDate(o.data_teste_pratico)}</td><td>${o.hora_teste_pratico||'—'}</td>
-      <td>${simpleSelectHtml(o, ['Pendente','Aprovado','Reprovado'], 'res-select', {'Pendente':'sit-aberto','Aprovado':'sit-aprovado','Reprovado':'sit-reprovado'}, 'Pendente')}</td>
+      <td>${o.cliente||''}</td><td>${o.whatsapp||'—'}</td>
+      <td>${pendenteBadge(!!o.data_teste_volante, 'Agendado')}</td>
+      <td>${leadTimeCell(o.etapa_entrada||o.updated_at)}</td>
+      <td class="row-actions">
+        <button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button>
+        <button class="btn btn-sm btn-yellow" data-agendar="${o.id}">Agendar</button>
+      </td>
+    </tr>
+  `).join('');
+  tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-agendar]').forEach(b=> b.addEventListener('click', ()=> openAgendarVolanteModal(b.dataset.agendar)));
+}
+function openAgendarVolanteModal(id){
+  const o = state.resultadoTeste.find(x=>x.id===id);
+  document.getElementById('volOrcId').value = id;
+  document.getElementById('volData').value = o?.data_teste_volante || todayISO();
+  document.getElementById('volHora').value = o?.hora_teste_volante || '09:00';
+  openModal('modalAgendarVolante');
+}
+document.getElementById('btnConfirmarAgendaVolante').addEventListener('click', async ()=>{
+  const id = document.getElementById('volOrcId').value;
+  const data_teste_volante = document.getElementById('volData').value || todayISO();
+  const hora_teste_volante = document.getElementById('volHora').value || null;
+  await updatePipeline(id, { etapa:'teste_volante_resultado', situacao_etapa:null, data_teste_volante, hora_teste_volante }, [renderResultadoTeste, renderTesteVolanteResultado]);
+  closeModal('modalAgendarVolante');
+});
+
+/* ---------- 9) RESULTADO TESTE DE VOLANTE ---------- */
+async function fetchTesteVolanteResultado(){
+  const { data, error } = await sb.from('orcamentos').select('*').eq('etapa','teste_volante_resultado').order('data_teste_volante',{ascending:false});
+  if(error){ showToast('Erro ao carregar: '+error.message, true); return []; }
+  return data || [];
+}
+async function renderTesteVolanteResultado(){ state.testeVolanteResultado = await fetchTesteVolanteResultado(); drawTesteVolanteResultadoTable(); }
+function drawTesteVolanteResultadoTable(){
+  const search = document.getElementById('volResSearch').value.toLowerCase();
+  const rows = state.testeVolanteResultado.filter(o => !search || (o.cliente||'').toLowerCase().includes(search));
+  const tbody = document.getElementById('volResTableBody');
+  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="6">Nenhum resultado encontrado.</td></tr>`; return; }
+  tbody.innerHTML = rows.map(o=>`
+    <tr>
+      <td>${o.cliente||''}</td><td>${fmtDate(o.data_teste_volante)}</td><td>${o.hora_teste_volante||'—'}</td>
+      <td>${simpleSelectHtml(o, ['Pendente','Aprovado','Reprovado'], 'volres-select', {'Pendente':'sit-aberto','Aprovado':'sit-aprovado','Reprovado':'sit-reprovado'}, 'Pendente')}</td>
+      <td>${leadTimeCell(o.etapa_entrada||o.updated_at)}</td>
       <td class="row-actions"><button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button></td>
     </tr>
   `).join('');
   tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
-  tbody.querySelectorAll('[data-res-select]').forEach(sel=> sel.addEventListener('change', (e)=> quickChangeResultadoTeste(sel.dataset.resSelect, e.target.value)));
+  tbody.querySelectorAll('[data-volres-select]').forEach(sel=> sel.addEventListener('change', (e)=> quickChangeTesteVolanteResultado(sel.dataset.volresSelect, e.target.value)));
 }
-async function quickChangeResultadoTeste(id, novoValor){
+document.getElementById('volResSearch').addEventListener('input', drawTesteVolanteResultadoTable);
+async function quickChangeTesteVolanteResultado(id, novoValor){
   if(novoValor === 'Reprovado'){
-    if(!confirm('Marcar como reprovado? O aluno voltará para o Agendamento de Teste Prático.')){ drawResultadoTesteTable(); return; }
-    await updatePipeline(id, { etapa:'teste_pratico', situacao_etapa:null, data_teste_pratico:null, hora_teste_pratico:null }, [renderResultadoTeste, renderTestePratico]);
+    if(!confirm('Marcar como reprovado? O aluno voltará para o Agendamento de Teste de Volante.')){ drawTesteVolanteResultadoTable(); return; }
+    await updatePipeline(id, { etapa:'resultado_teste', situacao_etapa:null, data_teste_volante:null, hora_teste_volante:null }, [renderTesteVolanteResultado, renderResultadoTeste]);
     return;
   }
   if(novoValor === 'Aprovado'){
-    if(!confirm('Marcar como aprovado? O aluno seguirá para Clientes Aprovados.')){ drawResultadoTesteTable(); return; }
-    await updatePipeline(id, { etapa:'aprovado_final', situacao_etapa:null }, [renderResultadoTeste, renderClientesAprovados]);
+    if(!confirm('Marcar como aprovado? O aluno seguirá para Alunos Aprovados.')){ drawTesteVolanteResultadoTable(); return; }
+    await updatePipeline(id, { etapa:'aprovado_final', situacao_etapa:null }, [renderTesteVolanteResultado, renderClientesAprovados]);
     return;
   }
-  await updatePipeline(id, { situacao_etapa:null }, [renderResultadoTeste]);
+  await updatePipeline(id, { situacao_etapa:null }, [renderTesteVolanteResultado]);
 }
 
-/* ---------- 9) CLIENTES APROVADOS (final) ---------- */
+/* ---------- 10) ALUNOS APROVADOS (final) ---------- */
 async function fetchClientesAprovados(){
-  const { data, error } = await sb.from('orcamentos').select('*, vendedor:vendedores(id,nome)').eq('etapa','aprovado_final').order('data_teste_pratico',{ascending:false});
+  const { data, error } = await sb.from('orcamentos').select('*, vendedor:vendedores(id,nome)').eq('etapa','aprovado_final').order('data_teste_volante',{ascending:false});
   if(error){ showToast('Erro ao carregar: '+error.message, true); return []; }
   return data || [];
 }
@@ -2822,11 +3476,12 @@ function drawClientesAprovadosTable(){
   const search = document.getElementById('finSearch').value.toLowerCase();
   const rows = state.clientesAprovados.filter(o => !search || (o.cliente||'').toLowerCase().includes(search));
   const tbody = document.getElementById('finTableBody');
-  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="7">Nenhum cliente concluiu o processo ainda.</td></tr>`; return; }
+  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="8">Nenhum cliente concluiu o processo ainda.</td></tr>`; return; }
   tbody.innerHTML = rows.map(o=>`
     <tr>
       <td>${o.cliente||''}</td><td>${o.whatsapp||'—'}</td><td>${fmtMoney(o.valor)}</td><td>${o.vendedor?.nome||'—'}</td>
-      <td>${o.turma||'—'}</td><td>${fmtDate(o.data_teste_pratico)}</td>
+      <td>${o.turma||'—'}</td><td>${fmtDate(o.data_teste_volante)}</td>
+      <td>${leadTimeCell(o.etapa_entrada||o.updated_at)}</td>
       <td class="row-actions"><button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button></td>
     </tr>
   `).join('');
