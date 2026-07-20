@@ -669,11 +669,11 @@ tbody tr:last-child td{border-bottom:none;}
         <div class="mini-chart-grid" style="grid-template-columns:1fr 1.4fr;margin-bottom:16px;">
           <div class="mini-chart-card">
             <div class="mini-chart-title">Motivos de Reprovação</div>
-            <div class="mini-chart-canvas-wrap"><canvas id="chartMotivosReprovacao"></canvas></div>
+            <div class="mini-chart-canvas-wrap" style="height:320px;"><canvas id="chartMotivosReprovacao"></canvas></div>
           </div>
           <div class="mini-chart-card">
             <div class="mini-chart-title">Leads Reprovados por Mês</div>
-            <div class="mini-chart-canvas-wrap"><canvas id="chartReprovadosPorMes"></canvas></div>
+            <div class="mini-chart-canvas-wrap" style="height:320px;"><canvas id="chartReprovadosPorMes"></canvas></div>
           </div>
         </div>
         <div class="toolbar">
@@ -1942,6 +1942,58 @@ function buildDashboardToolbar(){
 
 const CHART_PALETTE = ['#1477a8','#f5c518','#1f9d55','#d64545','#8b5cf6','#0d9488','#e08e0b','#64748b','#db2777','#0891b2'];
 
+/* Clareia uma cor hex em X% (0-100), usado para gerar degradês */
+function lightenHex(hex, pct){
+  const h = hex.replace('#','');
+  const num = parseInt(h.length===3 ? h.split('').map(c=>c+c).join('') : h, 16);
+  let r = (num >> 16) + Math.round(255 * pct/100 * (1 - (num >> 16)/255));
+  let g = ((num >> 8) & 0xff) + Math.round(255 * pct/100 * (1 - ((num >> 8)&0xff)/255));
+  let b = (num & 0xff) + Math.round(255 * pct/100 * (1 - (num & 0xff)/255));
+  r = Math.min(255,r); g = Math.min(255,g); b = Math.min(255,b);
+  return `rgb(${r},${g},${b})`;
+}
+/* Gera um degradê vertical (mais claro em cima, cor cheia embaixo) para barras verticais */
+function verticalBarGradient(color){
+  return (context) => {
+    const { chart } = context;
+    const { ctx: c, chartArea } = chart;
+    if(!chartArea) return color;
+    const gradient = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+    gradient.addColorStop(0, lightenHex(color, 35));
+    gradient.addColorStop(1, color);
+    return gradient;
+  };
+}
+/* Gera um degradê horizontal (cor cheia na base, mais claro na ponta) para barras horizontais */
+function horizontalBarGradient(color){
+  return (context) => {
+    const { chart } = context;
+    const { ctx: c, chartArea } = chart;
+    if(!chartArea) return color;
+    const gradient = c.createLinearGradient(chartArea.left, 0, chartArea.right, 0);
+    gradient.addColorStop(0, color);
+    gradient.addColorStop(1, lightenHex(color, 30));
+    return gradient;
+  };
+}
+/* Gera degradês radiais por fatia, um por cor da paleta, para gráficos de pizza/rosca */
+function pieSliceGradients(colors){
+  return (context) => {
+    const { chart, dataIndex } = context;
+    const { chartArea } = chart;
+    const base = colors[dataIndex % colors.length];
+    if(!chartArea) return base;
+    const c = chart.ctx;
+    const cx = (chartArea.left + chartArea.right)/2;
+    const cy = (chartArea.top + chartArea.bottom)/2;
+    const r = Math.min(chartArea.right-chartArea.left, chartArea.bottom-chartArea.top)/2;
+    const gradient = c.createRadialGradient(cx, cy, r*0.15, cx, cy, r);
+    gradient.addColorStop(0, lightenHex(base, 30));
+    gradient.addColorStop(1, base);
+    return gradient;
+  };
+}
+
 /* Plugin genérico: desenha o valor ao lado/em cima de cada barra */
 const BAR_VALUE_LABELS_PLUGIN = {
   id: 'barValueLabels',
@@ -1955,22 +2007,22 @@ const BAR_VALUE_LABELS_PLUGIN = {
         if(value === null || value === undefined) return;
         ctx.save();
         ctx.fillStyle = '#1f2937';
-        ctx.font = '700 15px Inter, sans-serif';
+        ctx.font = '700 13px Inter, sans-serif';
         if(chart.options.indexAxis === 'y'){
-          ctx.textAlign = value > 0 ? 'left' : 'left';
+          ctx.textAlign = 'left';
           ctx.textBaseline = 'middle';
           ctx.fillText(String(value), bar.x + 8, bar.y);
         } else {
           ctx.textAlign = 'center';
           ctx.textBaseline = 'bottom';
-          ctx.fillText(String(value), bar.x, bar.y - 6);
+          ctx.fillText(String(value), bar.x, bar.y - 8);
         }
         ctx.restore();
       });
     });
   }
 };
-/* Plugin genérico: desenha valor + percentual em cada fatia de gráfico de pizza/rosca */
+/* Plugin genérico: desenha apenas o valor (sem %) centralizado em cada fatia de pizza/rosca */
 const PIE_VALUE_LABELS_PLUGIN = {
   id: 'pieValueLabels',
   afterDatasetsDraw(chart){
@@ -1983,15 +2035,16 @@ const PIE_VALUE_LABELS_PLUGIN = {
       const value = dataset.data[i];
       if(!value) return;
       const pct = total ? Math.round((value/total)*100) : 0;
+      if(pct < 6) return; // fatia pequena demais: número fica só na legenda/tooltip
       const pos = arc.tooltipPosition();
       ctx.save();
       ctx.fillStyle = '#fff';
-      ctx.font = '700 14px Inter, sans-serif';
+      ctx.font = '700 13px Inter, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.shadowColor = 'rgba(0,0,0,0.45)';
-      ctx.shadowBlur = 3;
-      ctx.fillText(`${value} (${pct}%)`, pos.x, pos.y);
+      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ctx.shadowBlur = 4;
+      ctx.fillText(String(value), pos.x, pos.y);
       ctx.restore();
     });
   }
@@ -2043,8 +2096,8 @@ async function renderDashboard(){
   destroyChart('qtd');
   state.charts.qtd = new Chart(document.getElementById('chartQtd'), {
     type: 'bar',
-    data: { labels: ['Leads', 'Aprovados'], datasets: [{ data: [totalQtd, aprovQtd], backgroundColor: ['#1477a8','#1f9d55'], borderRadius:5 }] },
-    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ precision:0, font:{size:12} } }, x:{ ticks:{ font:{size:12} } } } },
+    data: { labels: ['Leads', 'Aprovados'], datasets: [{ data: [totalQtd, aprovQtd], backgroundColor: [verticalBarGradient('#1477a8'), verticalBarGradient('#1f9d55')], borderRadius:5 }] },
+    options: { responsive:true, maintainAspectRatio:false, layout:{padding:{top:20}}, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, suggestedMax: Math.max(totalQtd,aprovQtd,1)*1.25, ticks:{ precision:0, font:{size:12} } }, x:{ ticks:{ font:{size:12} } } } },
     plugins: [BAR_VALUE_LABELS_PLUGIN]
   });
   const miniQtdTitle = document.getElementById('miniQtdTitle');
@@ -2053,8 +2106,8 @@ async function renderDashboard(){
   destroyChart('valor');
   state.charts.valor = new Chart(document.getElementById('chartValor'), {
     type: 'bar',
-    data: { labels: ['Leads', 'Aprovados'], datasets: [{ data: [totalValor, aprovValor], backgroundColor: ['#1477a8','#1f9d55'], borderRadius:5 }] },
-    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ callback:(v)=>fmtMoney(v), font:{size:11} } }, x:{ ticks:{ font:{size:12} } } } },
+    data: { labels: ['Leads', 'Aprovados'], datasets: [{ data: [totalValor, aprovValor], backgroundColor: [verticalBarGradient('#1477a8'), verticalBarGradient('#1f9d55')], borderRadius:5 }] },
+    options: { responsive:true, maintainAspectRatio:false, layout:{padding:{top:20}}, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, suggestedMax: Math.max(totalValor,aprovValor,1)*1.25, ticks:{ callback:(v)=>fmtMoney(v), font:{size:11} } }, x:{ ticks:{ font:{size:12} } } } },
     plugins: [BAR_VALUE_LABELS_PLUGIN]
   });
   const miniValorTitle = document.getElementById('miniValorTitle');
@@ -2065,7 +2118,7 @@ async function renderDashboard(){
   destroyChart('origem');
   state.charts.origem = new Chart(document.getElementById('chartOrigem'), {
     type: 'doughnut',
-    data: { labels: origensAtivas.map(o=>o.nome), datasets: [{ data: origemCounts, backgroundColor: CHART_PALETTE }] },
+    data: { labels: origensAtivas.map(o=>o.nome), datasets: [{ data: origemCounts, backgroundColor: pieSliceGradients(CHART_PALETTE), borderColor:'#fff', borderWidth:1.5 }] },
     options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ boxWidth:8, font:{size:9.5}, padding:6 } } } }
   });
 
@@ -2076,8 +2129,8 @@ async function renderDashboard(){
   destroyChart('anual');
   state.charts.anual = new Chart(document.getElementById('chartAnual'), {
     type: 'bar',
-    data: { labels: MESES.map(m=>m.slice(0,3)), datasets: [{ label:'Aprovados', data: monthlyApproved, backgroundColor:'#1f9d55', borderRadius:4 }] },
-    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ precision:0, font:{size:11} } }, x:{ ticks:{ font:{size:11} } } } },
+    data: { labels: MESES.map(m=>m.slice(0,3)), datasets: [{ label:'Aprovados', data: monthlyApproved, backgroundColor: verticalBarGradient('#1f9d55'), borderRadius:4 }] },
+    options: { responsive:true, maintainAspectRatio:false, layout:{padding:{top:20}}, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, suggestedMax: Math.max(...monthlyApproved,1)*1.25, ticks:{ precision:0, font:{size:11} } }, x:{ ticks:{ font:{size:11} } } } },
     plugins: [BAR_VALUE_LABELS_PLUGIN]
   });
 
@@ -2124,15 +2177,16 @@ async function renderFunilEtapas(){
     return count || 0;
   }));
   destroyChart('funil');
-  const bg = FUNIL_ETAPAS.map(f => (f.label==='Reprovado no psico/médico' || f.label==='Reprovado na prova escrita') ? '#d64545' : (f.label==='Alunos aprovados' ? '#1f9d55' : '#1477a8'));
+  const bg = FUNIL_ETAPAS.map(f => (f.label==='Reprovado no psico/médico' || f.label==='Reprovado na prova escrita') ? horizontalBarGradient('#d64545') : (f.label==='Alunos aprovados' ? horizontalBarGradient('#1f9d55') : horizontalBarGradient('#1477a8')));
   state.charts.funil = new Chart(document.getElementById('chartFunil'), {
     type: 'bar',
     data: { labels: FUNIL_ETAPAS.map(f=>f.label), datasets: [{ data: counts, backgroundColor: bg, borderRadius:4 }] },
     options: {
       indexAxis: 'y',
       responsive:true, maintainAspectRatio:false,
+      layout:{ padding:{ right:40 } },
       plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:(c)=> c.parsed.x + ' aluno' + (c.parsed.x===1?'':'s') } } },
-      scales:{ x:{ beginAtZero:true, ticks:{ precision:0, font:{size:12} } }, y:{ ticks:{ font:{size:12} } } }
+      scales:{ x:{ beginAtZero:true, suggestedMax: Math.max(...counts,1)*1.15, ticks:{ precision:0, font:{size:12} } }, y:{ ticks:{ font:{size:12} } } }
     },
     plugins: [BAR_VALUE_LABELS_PLUGIN]
   });
@@ -2371,14 +2425,32 @@ function drawMotivosReprovacaoChart(){
   });
   const labels = Object.keys(counts);
   const data = Object.values(counts);
+  const total = data.reduce((a,b)=>a+b,0);
   destroyChart('motivosRepr');
   state.charts.motivosRepr = new Chart(document.getElementById('chartMotivosReprovacao'), {
     type: 'pie',
-    data: { labels, datasets: [{ data, backgroundColor: CHART_PALETTE }] },
+    data: { labels, datasets: [{ data, backgroundColor: pieSliceGradients(CHART_PALETTE), borderColor:'#fff', borderWidth:2 }] },
     options: {
       responsive:true, maintainAspectRatio:false,
+      layout:{ padding:8 },
       plugins:{
-        legend:{ position:'bottom', labels:{ boxWidth:13, font:{size:13,weight:'600'} } },
+        legend:{
+          position:'bottom',
+          labels:{
+            boxWidth:12, font:{size:12,weight:'600'}, padding:10,
+            generateLabels(chart){
+              return chart.data.labels.map((label,i)=>{
+                const val = chart.data.datasets[0].data[i];
+                const pct = total ? Math.round((val/total)*100) : 0;
+                return {
+                  text: `${label} — ${val} (${pct}%)`,
+                  fillStyle: CHART_PALETTE[i % CHART_PALETTE.length],
+                  strokeStyle:'#fff', lineWidth:1, index:i
+                };
+              });
+            }
+          }
+        },
         tooltip:{ callbacks:{ label:(c)=> `${c.label}: ${c.parsed} lead${c.parsed===1?'':'s'}` } }
       }
     },
@@ -2397,11 +2469,15 @@ function drawReprovadosPorMesChart(){
   destroyChart('reprPorMes');
   state.charts.reprPorMes = new Chart(document.getElementById('chartReprovadosPorMes'), {
     type: 'bar',
-    data: { labels: MESES.map(m=>m.slice(0,3)), datasets: [{ data: counts, backgroundColor:'#d64545', borderRadius:4 }] },
+    data: { labels: MESES.map(m=>m.slice(0,3)), datasets: [{ data: counts, backgroundColor: verticalBarGradient('#d64545'), borderRadius:5, maxBarThickness:42 }] },
     options: {
       responsive:true, maintainAspectRatio:false,
+      layout:{ padding:{ top:26 } },
       plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:(c)=> c.parsed.y + ' lead' + (c.parsed.y===1?'':'s') } } },
-      scales:{ y:{ beginAtZero:true, ticks:{ precision:0, font:{size:11} } }, x:{ ticks:{ font:{size:11} } } }
+      scales:{
+        y:{ beginAtZero:true, suggestedMax: Math.max(...counts, 1) + 1, ticks:{ precision:0, font:{size:11} } },
+        x:{ ticks:{ font:{size:11} } }
+      }
     },
     plugins:[BAR_VALUE_LABELS_PLUGIN]
   });
