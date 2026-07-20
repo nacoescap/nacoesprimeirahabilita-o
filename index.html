@@ -720,6 +720,12 @@ tbody tr:last-child td{border-bottom:none;}
         <div class="toolbar">
           <input type="text" class="search-input" id="aprSearch" placeholder="Buscar por cliente, CPF ou WhatsApp..." />
           <select id="aprFiltroOrigem"><option value="">Origem: Todas</option></select>
+          <select id="aprFiltroMes"></select>
+          <select id="aprFiltroAno"></select>
+          <span class="muted small">de</span>
+          <input type="date" id="aprFiltroDataIni" title="Data inicial" />
+          <span class="muted small">até</span>
+          <input type="date" id="aprFiltroDataFim" title="Data final" />
           <div class="spacer"></div>
         </div>
         <div class="table-wrap">
@@ -2482,7 +2488,6 @@ async function quickChangeSituacaoCliente(id, novaSituacao){
       return;
     }
     const payload = { situacao_cliente:'Aprovado', data_aprovacao: todayISO(), motivo_reprovado_cliente_id:null };
-    if(!o.etapa){ payload.etapa = 'exames'; payload.situacao_etapa = 'Em Andamento'; }
     await updateSituacaoClienteRapida(id, payload);
     return;
   }
@@ -2982,13 +2987,32 @@ async function fetchAprovados(){
 async function renderAprovados(){
   state.aprovados = await fetchAprovados();
   renderStatsRow('aprStatsRow', state.aprovados, o=> o.etapa ? (o.etapa_entrada||o.updated_at) : o.data_aprovacao);
+  buildAprovadosToolbarOnce();
   drawAprovadosTable();
+}
+function buildAprovadosToolbarOnce(){
+  if(document.getElementById('aprFiltroMes').options.length) return;
+  const now = new Date();
+  const anos = []; for(let a=now.getFullYear()-2; a<=now.getFullYear()+1; a++) anos.push(a);
+  document.getElementById('aprFiltroMes').innerHTML = `<option value="">Mês: Todos</option>` + MESES.map((m,i)=>`<option value="${i+1}">${m}</option>`).join('');
+  document.getElementById('aprFiltroAno').innerHTML = `<option value="">Ano: Todos</option>` + anos.map(a=>`<option value="${a}">${a}</option>`).join('');
 }
 function drawAprovadosTable(){
   const search = document.getElementById('aprSearch').value.toLowerCase();
   const fOri = document.getElementById('aprFiltroOrigem').value;
+  const fMes = document.getElementById('aprFiltroMes').value;
+  const fAno = document.getElementById('aprFiltroAno').value;
+  const fDataIni = document.getElementById('aprFiltroDataIni').value;
+  const fDataFim = document.getElementById('aprFiltroDataFim').value;
   let rows = state.aprovados.filter(o=>{
     if(fOri && o.origem?.id !== fOri) return false;
+    if(o.data_aprovacao){
+      const [y,m] = o.data_aprovacao.split('-');
+      if(fMes && Number(m) !== Number(fMes)) return false;
+      if(fAno && Number(y) !== Number(fAno)) return false;
+      if(fDataIni && o.data_aprovacao < fDataIni) return false;
+      if(fDataFim && o.data_aprovacao > fDataFim) return false;
+    } else if(fMes || fAno || fDataIni || fDataFim) return false;
     if(search){
       const blob = `${o.cliente||''} ${o.cpf||''} ${o.whatsapp||''}`.toLowerCase();
       if(!blob.includes(search)) return false;
@@ -3051,7 +3075,7 @@ function etapaCell(o){
 async function enviarParaAssinaturaContrato(id){
   await updatePipeline(id, { etapa:'assinatura_contrato', situacao_etapa:'Em Andamento' }, [renderAprovados, renderAssinaturaContrato]);
 }
-['aprSearch','aprFiltroOrigem'].forEach(id=>{
+['aprSearch','aprFiltroOrigem','aprFiltroMes','aprFiltroAno','aprFiltroDataIni','aprFiltroDataFim'].forEach(id=>{
   document.getElementById(id).addEventListener('input', drawAprovadosTable);
   document.getElementById(id).addEventListener('change', drawAprovadosTable);
 });
