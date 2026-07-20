@@ -172,7 +172,12 @@ input,select,textarea{font-family:inherit;}
 .nav-group-label{
   padding:12px 18px 4px;font-size:10.5px;font-weight:700;letter-spacing:1px;
   color:rgba(255,255,255,0.45);text-transform:uppercase;white-space:nowrap;overflow:hidden;
+  display:flex;align-items:center;justify-content:space-between;gap:6px;cursor:pointer;user-select:none;
 }
+.nav-group-label:hover{color:rgba(255,255,255,0.75);}
+.nav-group-label .chevron{transition:transform .15s ease;flex-shrink:0;}
+.nav-group.collapsed .nav-group-label .chevron{transform:rotate(-90deg);}
+.nav-group.collapsed .nav-item{display:none;}
 .sidebar.collapsed .nav-group-label{display:none;}
 .nav-item{
   display:flex;align-items:center;gap:12px;
@@ -437,8 +442,8 @@ tbody tr:last-child td{border-bottom:none;}
           <span>Painel</span>
         </div>
       </div>
-      <div class="nav-group">
-        <div class="nav-group-label">Vendas</div>
+      <div class="nav-group" data-group="vendas">
+        <div class="nav-group-label" data-toggle-group="vendas"><span>Vendas</span><svg class="chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
         <div class="nav-item" data-view="orcamentos">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           <span>Leads</span>
@@ -464,8 +469,8 @@ tbody tr:last-child td{border-bottom:none;}
           <span>Cobrança</span>
         </div>
       </div>
-      <div class="nav-group">
-        <div class="nav-group-label">Processo do Aluno</div>
+      <div class="nav-group" data-group="processo">
+        <div class="nav-group-label" data-toggle-group="processo"><span>Processo do Aluno</span><svg class="chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
         <div class="nav-item" data-view="exames">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8M16 17H8M10 9H8"/></svg>
           <span>Exame médico e psico</span>
@@ -527,8 +532,8 @@ tbody tr:last-child td{border-bottom:none;}
           <span>Alunos aprovados</span>
         </div>
       </div>
-      <div class="nav-group">
-        <div class="nav-group-label">Indicadores</div>
+      <div class="nav-group" data-group="indicadores">
+        <div class="nav-group-label" data-toggle-group="indicadores"><span>Indicadores</span><svg class="chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
         <div class="nav-item" data-view="ind-contato">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-4"/></svg>
           <span>Contatos por Origem</span>
@@ -546,8 +551,8 @@ tbody tr:last-child td{border-bottom:none;}
           <span>Indicador: Aprovados</span>
         </div>
       </div>
-      <div class="nav-group">
-        <div class="nav-group-label">Cadastros</div>
+      <div class="nav-group" data-group="cadastros">
+        <div class="nav-group-label" data-toggle-group="cadastros"><span>Cadastros</span><svg class="chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
         <div class="nav-item" data-view="cad-vendedores">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           <span>Vendedores</span>
@@ -1830,6 +1835,9 @@ function goToView(view){
   document.querySelectorAll('.nav-item[data-view]').forEach(el=>{
     el.classList.toggle('active', el.dataset.view === view);
   });
+  const activeItem = document.querySelector(`.nav-item[data-view="${view}"]`);
+  const activeGroup = activeItem ? activeItem.closest('.nav-group[data-group]') : null;
+  if(activeGroup) setNavGroupCollapsed(activeGroup.dataset.group, false);
   document.querySelectorAll('.view').forEach(el=> el.classList.remove('active'));
   document.getElementById('view-'+view).classList.add('active');
   document.getElementById('topbarTitle').textContent = viewTitles[view] || '';
@@ -1870,6 +1878,29 @@ function goToView(view){
 document.querySelectorAll('.nav-item[data-view]').forEach(el=>{
   el.addEventListener('click', ()=> goToView(el.dataset.view));
 });
+
+/* ---------- Menu lateral: grupos recolhíveis (Vendas, Processo do Aluno, Indicadores, Cadastros) ---------- */
+function setNavGroupCollapsed(groupKey, collapsed){
+  const group = document.querySelector(`.nav-group[data-group="${groupKey}"]`);
+  if(!group) return;
+  group.classList.toggle('collapsed', collapsed);
+  const estado = JSON.parse(safeStorage('getItem','nacoes_nav_collapsed') || '{}');
+  estado[groupKey] = collapsed;
+  safeStorage('setItem','nacoes_nav_collapsed', JSON.stringify(estado));
+}
+document.querySelectorAll('[data-toggle-group]').forEach(label=>{
+  label.addEventListener('click', ()=>{
+    const key = label.dataset.toggleGroup;
+    const group = label.closest('.nav-group');
+    setNavGroupCollapsed(key, !group.classList.contains('collapsed'));
+  });
+});
+(function restoreNavGroupsState(){
+  const estado = JSON.parse(safeStorage('getItem','nacoes_nav_collapsed') || '{}');
+  Object.keys(estado).forEach(key=>{
+    if(estado[key]) setNavGroupCollapsed(key, true);
+  });
+})();
 document.querySelectorAll('[data-goto]').forEach(el=>{
   el.addEventListener('click', ()=>{
     document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.add('hidden'));
@@ -1952,7 +1983,7 @@ function lightenHex(hex, pct){
   r = Math.min(255,r); g = Math.min(255,g); b = Math.min(255,b);
   return `rgb(${r},${g},${b})`;
 }
-/* Gera um degradê vertical (mais claro em cima, cor cheia embaixo) para barras verticais */
+/* Gera um degradê vertical (mais claro em cima, cor cheia embaixo) para barras verticais — cor única para todo o dataset */
 function verticalBarGradient(color){
   return (context) => {
     const { chart } = context;
@@ -1964,11 +1995,40 @@ function verticalBarGradient(color){
     return gradient;
   };
 }
-/* Gera um degradê horizontal (cor cheia na base, mais claro na ponta) para barras horizontais */
+/* Igual à anterior, mas com uma cor diferente por barra (dataIndex). IMPORTANTE: o Chart.js só
+   executa funções quando backgroundColor é a própria função — colocar funções dentro de um array
+   não funciona (ele tenta interpretar a função como cor e pinta tudo de preto). Por isso o resolver
+   de cor por índice precisa ser UMA função só, não um array de funções. */
+function verticalBarGradientMulti(colors){
+  return (context) => {
+    const { chart, dataIndex } = context;
+    const { ctx: c, chartArea } = chart;
+    const color = colors[dataIndex % colors.length];
+    if(!chartArea) return color;
+    const gradient = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+    gradient.addColorStop(0, lightenHex(color, 35));
+    gradient.addColorStop(1, color);
+    return gradient;
+  };
+}
+/* Gera um degradê horizontal (cor cheia na base, mais claro na ponta) para barras horizontais — cor única */
 function horizontalBarGradient(color){
   return (context) => {
     const { chart } = context;
     const { ctx: c, chartArea } = chart;
+    if(!chartArea) return color;
+    const gradient = c.createLinearGradient(chartArea.left, 0, chartArea.right, 0);
+    gradient.addColorStop(0, color);
+    gradient.addColorStop(1, lightenHex(color, 30));
+    return gradient;
+  };
+}
+/* Igual, mas permite escolher a cor base por índice/label (ex: vermelho nas reprovações do funil) */
+function horizontalBarGradientByIndex(colorForIndexFn){
+  return (context) => {
+    const { chart, dataIndex } = context;
+    const { ctx: c, chartArea } = chart;
+    const color = colorForIndexFn(dataIndex);
     if(!chartArea) return color;
     const gradient = c.createLinearGradient(chartArea.left, 0, chartArea.right, 0);
     gradient.addColorStop(0, color);
@@ -2096,7 +2156,7 @@ async function renderDashboard(){
   destroyChart('qtd');
   state.charts.qtd = new Chart(document.getElementById('chartQtd'), {
     type: 'bar',
-    data: { labels: ['Leads', 'Aprovados'], datasets: [{ data: [totalQtd, aprovQtd], backgroundColor: [verticalBarGradient('#1477a8'), verticalBarGradient('#1f9d55')], borderRadius:5 }] },
+    data: { labels: ['Leads', 'Aprovados'], datasets: [{ data: [totalQtd, aprovQtd], backgroundColor: verticalBarGradientMulti(['#1477a8','#f5c518']), borderRadius:5 }] },
     options: { responsive:true, maintainAspectRatio:false, layout:{padding:{top:20}}, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, suggestedMax: Math.max(totalQtd,aprovQtd,1)*1.25, ticks:{ precision:0, font:{size:12} } }, x:{ ticks:{ font:{size:12} } } } },
     plugins: [BAR_VALUE_LABELS_PLUGIN]
   });
@@ -2106,7 +2166,7 @@ async function renderDashboard(){
   destroyChart('valor');
   state.charts.valor = new Chart(document.getElementById('chartValor'), {
     type: 'bar',
-    data: { labels: ['Leads', 'Aprovados'], datasets: [{ data: [totalValor, aprovValor], backgroundColor: [verticalBarGradient('#1477a8'), verticalBarGradient('#1f9d55')], borderRadius:5 }] },
+    data: { labels: ['Leads', 'Aprovados'], datasets: [{ data: [totalValor, aprovValor], backgroundColor: verticalBarGradientMulti(['#1477a8','#f5c518']), borderRadius:5 }] },
     options: { responsive:true, maintainAspectRatio:false, layout:{padding:{top:20}}, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, suggestedMax: Math.max(totalValor,aprovValor,1)*1.25, ticks:{ callback:(v)=>fmtMoney(v), font:{size:11} } }, x:{ ticks:{ font:{size:12} } } } },
     plugins: [BAR_VALUE_LABELS_PLUGIN]
   });
@@ -2129,7 +2189,7 @@ async function renderDashboard(){
   destroyChart('anual');
   state.charts.anual = new Chart(document.getElementById('chartAnual'), {
     type: 'bar',
-    data: { labels: MESES.map(m=>m.slice(0,3)), datasets: [{ label:'Aprovados', data: monthlyApproved, backgroundColor: verticalBarGradient('#1f9d55'), borderRadius:4 }] },
+    data: { labels: MESES.map(m=>m.slice(0,3)), datasets: [{ label:'Aprovados', data: monthlyApproved, backgroundColor: verticalBarGradient('#f5c518'), borderRadius:4 }] },
     options: { responsive:true, maintainAspectRatio:false, layout:{padding:{top:20}}, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, suggestedMax: Math.max(...monthlyApproved,1)*1.25, ticks:{ precision:0, font:{size:11} } }, x:{ ticks:{ font:{size:11} } } } },
     plugins: [BAR_VALUE_LABELS_PLUGIN]
   });
@@ -2177,7 +2237,12 @@ async function renderFunilEtapas(){
     return count || 0;
   }));
   destroyChart('funil');
-  const bg = FUNIL_ETAPAS.map(f => (f.label==='Reprovado no psico/médico' || f.label==='Reprovado na prova escrita') ? horizontalBarGradient('#d64545') : (f.label==='Alunos aprovados' ? horizontalBarGradient('#1f9d55') : horizontalBarGradient('#1477a8')));
+  const bg = horizontalBarGradientByIndex(i => {
+    const label = FUNIL_ETAPAS[i].label;
+    if(label==='Reprovado no psico/médico' || label==='Reprovado na prova escrita') return '#d64545';
+    if(label==='Alunos aprovados') return '#f5c518';
+    return '#1477a8';
+  });
   state.charts.funil = new Chart(document.getElementById('chartFunil'), {
     type: 'bar',
     data: { labels: FUNIL_ETAPAS.map(f=>f.label), datasets: [{ data: counts, backgroundColor: bg, borderRadius:4 }] },
