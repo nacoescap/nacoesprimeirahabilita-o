@@ -443,6 +443,10 @@ tbody tr:last-child td{border-bottom:none;}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           <span>Leads</span>
         </div>
+        <div class="nav-item" data-view="leads-reprovados">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+          <span>Leads reprovados</span>
+        </div>
         <div class="nav-item" data-view="enviados">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4Z"/></svg>
           <span>Orçamento enviado</span>
@@ -630,7 +634,6 @@ tbody tr:last-child td{border-bottom:none;}
           <select id="orcFiltroSituacao">
             <option value="">Situação: Todas</option>
             <option value="Aberto">Aberto</option>
-            <option value="Reprovado">Reprovado</option>
           </select>
           <select id="orcFiltroVendedor"><option value="">Vendedor: Todos</option></select>
           <select id="orcFiltroOrigem"><option value="">Origem: Todas</option></select>
@@ -644,6 +647,27 @@ tbody tr:last-child td{border-bottom:none;}
               <th>Carteira</th><th>Aulas</th><th>Origem</th><th>Vendedor</th><th>Situação</th><th>Lead time</th><th>Follow-up</th><th>Ações</th>
             </tr></thead>
             <tbody id="orcTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ LEADS REPROVADOS ============ -->
+      <section class="view" id="view-leads-reprovados">
+        <div class="card" style="margin-bottom:16px;">
+          <div class="mini-chart-title" style="margin-bottom:10px;">Motivos de Reprovação · Quantidade de Leads</div>
+          <div style="position:relative;height:260px;"><canvas id="chartMotivosReprovacao"></canvas></div>
+        </div>
+        <div class="toolbar">
+          <input type="text" class="search-input" id="leadReprSearch" placeholder="Buscar por cliente, CPF ou WhatsApp..." />
+          <div class="spacer"></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Abertura</th><th>Cliente</th><th>WhatsApp</th><th>CPF</th><th>Origem</th>
+              <th>Vendedor</th><th>Motivo da Reprovação</th><th>Ações</th>
+            </tr></thead>
+            <tbody id="leadReprTableBody"></tbody>
           </table>
         </div>
       </section>
@@ -1443,6 +1467,7 @@ const AUTH_PASS = 'C@pnac_2026';
 /* Telas controláveis por permissão (usadas no cadastro de usuários) */
 const VIEW_LIST = [
   { key:'orcamentos', label:'Leads' },
+  { key:'leads-reprovados', label:'Leads reprovados' },
   { key:'enviados', label:'Orçamento enviado' },
   { key:'aprovados', label:'Aprovados' },
   { key:'assinatura-contrato', label:'Assinatura de contrato' },
@@ -1485,6 +1510,7 @@ const state = {
   vendedores: [],
   motivos: [],
   orcamentos: [],
+  leadsReprovados: [],
   enviados: [],
   aprovados: [],
   assinaturaContrato: [],
@@ -1735,7 +1761,7 @@ document.getElementById('logoutBtn').addEventListener('click', ()=>{
    NAVEGAÇÃO
    ===================================================================== */
 const viewTitles = {
-  'dashboard':'Painel','orcamentos':'Leads','enviados':'Orçamento enviado','aprovados':'Aprovados',
+  'dashboard':'Painel','orcamentos':'Leads','leads-reprovados':'Leads reprovados','enviados':'Orçamento enviado','aprovados':'Aprovados',
   'exames':'Exame médico e psico','conferencia':'Conferência de Resultados',
   'alunos-reprovados':'Reprovado no psico/médico','cobranca':'Cobrança','aulas':'Curso teórico',
   'agendados':'Curso teórico concluído','teste-pratico':'Agend. aulas práticas',
@@ -1766,6 +1792,7 @@ function goToView(view){
 
   if(view === 'dashboard') renderDashboard();
   if(view === 'orcamentos') renderOrcamentos();
+  if(view === 'leads-reprovados') renderLeadsReprovados();
   if(view === 'enviados') renderEnviados();
   if(view === 'aprovados') renderAprovados();
   if(view === 'assinatura-contrato') renderAssinaturaContrato();
@@ -1871,6 +1898,35 @@ function buildDashboardToolbar(){
 
 const CHART_PALETTE = ['#1477a8','#f5c518','#1f9d55','#d64545','#8b5cf6','#0d9488','#e08e0b','#64748b','#db2777','#0891b2'];
 
+/* Plugin genérico: desenha o valor ao lado/em cima de cada barra */
+const BAR_VALUE_LABELS_PLUGIN = {
+  id: 'barValueLabels',
+  afterDatasetsDraw(chart){
+    const { ctx } = chart;
+    chart.data.datasets.forEach((dataset, dsIndex)=>{
+      const meta = chart.getDatasetMeta(dsIndex);
+      if(meta.hidden) return;
+      meta.data.forEach((bar, i)=>{
+        const value = dataset.data[i];
+        if(value === null || value === undefined) return;
+        ctx.save();
+        ctx.fillStyle = '#1f2937';
+        ctx.font = '600 11px Inter, sans-serif';
+        if(chart.options.indexAxis === 'y'){
+          ctx.textAlign = value > 0 ? 'left' : 'left';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(String(value), bar.x + 6, bar.y);
+        } else {
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+          ctx.fillText(String(value), bar.x, bar.y - 4);
+        }
+        ctx.restore();
+      });
+    });
+  }
+};
+
 function destroyChart(key){
   if(state.charts[key]){ state.charts[key].destroy(); state.charts[key] = null; }
 }
@@ -1918,7 +1974,8 @@ async function renderDashboard(){
   state.charts.qtd = new Chart(document.getElementById('chartQtd'), {
     type: 'bar',
     data: { labels: ['Leads', 'Aprovados'], datasets: [{ data: [totalQtd, aprovQtd], backgroundColor: ['#1477a8','#1f9d55'], borderRadius:5 }] },
-    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ precision:0, font:{size:10} } }, x:{ ticks:{ font:{size:10} } } } }
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ precision:0, font:{size:10} } }, x:{ ticks:{ font:{size:10} } } } },
+    plugins: [BAR_VALUE_LABELS_PLUGIN]
   });
   const miniQtdTitle = document.getElementById('miniQtdTitle');
   if(miniQtdTitle) miniQtdTitle.textContent = `Qtd: Orç. x Aprov. (${pctQtd.toFixed(0)}%)`;
@@ -1927,7 +1984,8 @@ async function renderDashboard(){
   state.charts.valor = new Chart(document.getElementById('chartValor'), {
     type: 'bar',
     data: { labels: ['Leads', 'Aprovados'], datasets: [{ data: [totalValor, aprovValor], backgroundColor: ['#1477a8','#1f9d55'], borderRadius:5 }] },
-    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ callback:(v)=>fmtMoney(v), font:{size:9} } }, x:{ ticks:{ font:{size:10} } } } }
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ callback:(v)=>fmtMoney(v), font:{size:9} } }, x:{ ticks:{ font:{size:10} } } } },
+    plugins: [BAR_VALUE_LABELS_PLUGIN]
   });
   const miniValorTitle = document.getElementById('miniValorTitle');
   if(miniValorTitle) miniValorTitle.textContent = `Valor: Orç. x Aprov. (${pctValor.toFixed(0)}%)`;
@@ -1949,7 +2007,8 @@ async function renderDashboard(){
   state.charts.anual = new Chart(document.getElementById('chartAnual'), {
     type: 'bar',
     data: { labels: MESES.map(m=>m.slice(0,3)), datasets: [{ label:'Aprovados', data: monthlyApproved, backgroundColor:'#1f9d55', borderRadius:4 }] },
-    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ precision:0, font:{size:9} } }, x:{ ticks:{ font:{size:9} } } } }
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ precision:0, font:{size:9} } }, x:{ ticks:{ font:{size:9} } } } },
+    plugins: [BAR_VALUE_LABELS_PLUGIN]
   });
 
   const [gaugeProp, gaugeCont, gaugeAprov] = await Promise.all([
@@ -2004,7 +2063,8 @@ async function renderFunilEtapas(){
       responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:(c)=> c.parsed.x + ' aluno' + (c.parsed.x===1?'':'s') } } },
       scales:{ x:{ beginAtZero:true, ticks:{ precision:0, font:{size:10} } }, y:{ ticks:{ font:{size:10.5} } } }
-    }
+    },
+    plugins: [BAR_VALUE_LABELS_PLUGIN]
   });
 }
 
@@ -2067,7 +2127,7 @@ function renderGauge(canvasId, chartKey, pct, real, meta, metaElId){
 async function fetchOrcamentos(){
   const { data, error } = await sb.from('orcamentos')
     .select('*, origem:origens(id,nome), vendedor:vendedores(id,nome), motivo:motivos_reprovacao!motivo_reprovado_id(id,nome)')
-    .neq('situacao','Enviado ao Cliente')
+    .eq('situacao','Aberto')
     .order('data_abertura',{ascending:false});
   if(error){ showToast('Erro ao carregar orçamentos: '+error.message, true); return []; }
   return data || [];
@@ -2171,6 +2231,80 @@ function situacaoSelectHtml(o){
   </select>`;
 }
 
+/* =====================================================================
+   LEADS REPROVADOS
+   ===================================================================== */
+async function fetchLeadsReprovados(){
+  const { data, error } = await sb.from('orcamentos')
+    .select('*, origem:origens(id,nome), vendedor:vendedores(id,nome), motivo:motivos_reprovacao!motivo_reprovado_id(id,nome)')
+    .eq('situacao','Reprovado')
+    .order('data_abertura',{ascending:false});
+  if(error){ showToast('Erro ao carregar leads reprovados: '+error.message, true); return []; }
+  return data || [];
+}
+async function renderLeadsReprovados(){
+  state.leadsReprovados = await fetchLeadsReprovados();
+  drawMotivosReprovacaoChart();
+  drawLeadsReprovadosTable();
+}
+function drawMotivosReprovacaoChart(){
+  const counts = {};
+  state.leadsReprovados.forEach(o=>{
+    const nome = o.motivo?.nome || 'Sem motivo informado';
+    counts[nome] = (counts[nome]||0) + 1;
+  });
+  const labels = Object.keys(counts);
+  const data = Object.values(counts);
+  destroyChart('motivosRepr');
+  state.charts.motivosRepr = new Chart(document.getElementById('chartMotivosReprovacao'), {
+    type: 'bar',
+    data: { labels, datasets: [{ data, backgroundColor:'#d64545', borderRadius:4 }] },
+    options: {
+      indexAxis: 'y',
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:(c)=> c.parsed.x + ' lead' + (c.parsed.x===1?'':'s') } } },
+      scales:{ x:{ beginAtZero:true, ticks:{ precision:0, font:{size:10} } }, y:{ ticks:{ font:{size:10.5} } } }
+    },
+    plugins:[BAR_VALUE_LABELS_PLUGIN]
+  });
+}
+function drawLeadsReprovadosTable(){
+  const search = document.getElementById('leadReprSearch').value.toLowerCase();
+  const rows = state.leadsReprovados.filter(o=>{
+    if(!search) return true;
+    const blob = `${o.cliente||''} ${o.cpf||''} ${o.whatsapp||''}`.toLowerCase();
+    return blob.includes(search);
+  });
+  const tbody = document.getElementById('leadReprTableBody');
+  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="8">Nenhum lead reprovado.</td></tr>`; return; }
+  tbody.innerHTML = rows.map(o=>`
+    <tr>
+      <td>${fmtDate(o.data_abertura)}</td>
+      <td>${o.cliente||''}</td>
+      <td>${o.whatsapp||'—'}</td>
+      <td>${o.cpf||'—'}</td>
+      <td>${o.origem?.nome||'—'}</td>
+      <td>${o.vendedor?.nome||'—'}</td>
+      <td>${o.motivo?.nome||'—'}</td>
+      <td class="row-actions">
+        <button title="Editar" data-editrepr="${o.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+        </button>
+        <button title="Reabrir como Lead" data-reabrir="${o.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+  tbody.querySelectorAll('[data-editrepr]').forEach(b=> b.addEventListener('click', ()=> openOrcamentoModal(b.dataset.editrepr)));
+  tbody.querySelectorAll('[data-reabrir]').forEach(b=> b.addEventListener('click', ()=> reabrirLead(b.dataset.reabrir)));
+}
+document.getElementById('leadReprSearch').addEventListener('input', drawLeadsReprovadosTable);
+async function reabrirLead(id){
+  if(!confirm('Reabrir este lead? Ele voltará para a lista de Leads.')) return;
+  await updateSituacaoRapida(id, { situacao:'Aberto', motivo_reprovado_id:null }, [renderLeadsReprovados, renderOrcamentos]);
+}
+
 /* Alteração rápida de situação direto na lista (sem abrir o Editar) */
 async function quickChangeSituacao(id, novaSituacao){
   const o = state.orcamentos.find(x=>x.id===id);
@@ -2193,12 +2327,12 @@ async function quickChangeSituacao(id, novaSituacao){
     return;
   }
 }
-async function updateSituacaoRapida(id, payload){
+async function updateSituacaoRapida(id, payload, refreshFns){
   payload.updated_at = new Date().toISOString();
   const { error } = await sb.from('orcamentos').update(payload).eq('id', id);
   if(error){ showToast('Erro ao atualizar situação: '+error.message, true); drawOrcamentosTable(); return; }
   showToast('Situação atualizada.');
-  renderOrcamentos();
+  for(const fn of (refreshFns || [renderOrcamentos])){ await fn(); }
 }
 
 /* Alteração rápida da situação do cliente (telas Orçamento enviado / Aprovados) */
@@ -2286,7 +2420,7 @@ function openOrcamentoModal(id){
   document.getElementById('modalOrcamentoTitle').textContent = editing ? 'Editar Lead' : 'Novo Lead';
   document.getElementById('orcId').value = id || '';
   if(editing){
-    const o = state.orcamentos.find(x=>x.id===id);
+    const o = state.orcamentos.find(x=>x.id===id) || state.leadsReprovados.find(x=>x.id===id);
     document.getElementById('orcDataAbertura').value = o.data_abertura || '';
     document.getElementById('orcCliente').value = o.cliente || '';
     document.getElementById('orcWhatsapp').value = o.whatsapp || '';
@@ -2462,7 +2596,7 @@ document.getElementById('btnConfirmarReprovacao').addEventListener('click', asyn
   if(motivoRapidoContext === 'cliente'){
     await updateSituacaoClienteRapida(id, { situacao_cliente:'Reprovado', motivo_reprovado_cliente_id: motivo, data_aprovacao: null, etapa:null, situacao_etapa:null });
   } else {
-    await updateSituacaoRapida(id, { situacao:'Reprovado', motivo_reprovado_id: motivo });
+    await updateSituacaoRapida(id, { situacao:'Reprovado', motivo_reprovado_id: motivo }, [renderOrcamentos, renderLeadsReprovados]);
   }
   closeModal('modalMotivoRapido');
 });
