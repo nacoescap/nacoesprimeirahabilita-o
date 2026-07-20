@@ -653,9 +653,20 @@ tbody tr:last-child td{border-bottom:none;}
 
       <!-- ============ LEADS REPROVADOS ============ -->
       <section class="view" id="view-leads-reprovados">
-        <div class="card" style="margin-bottom:16px;">
-          <div class="mini-chart-title" style="margin-bottom:10px;">Motivos de Reprovação · Quantidade de Leads</div>
-          <div style="position:relative;height:260px;"><canvas id="chartMotivosReprovacao"></canvas></div>
+        <div class="toolbar">
+          <select id="leadReprFiltroMes"></select>
+          <select id="leadReprFiltroAno"></select>
+          <div class="spacer"></div>
+        </div>
+        <div class="mini-chart-grid" style="grid-template-columns:1fr 1.4fr;margin-bottom:16px;">
+          <div class="mini-chart-card">
+            <div class="mini-chart-title">Motivos de Reprovação</div>
+            <div class="mini-chart-canvas-wrap"><canvas id="chartMotivosReprovacao"></canvas></div>
+          </div>
+          <div class="mini-chart-card">
+            <div class="mini-chart-title">Leads Reprovados por Mês</div>
+            <div class="mini-chart-canvas-wrap"><canvas id="chartReprovadosPorMes"></canvas></div>
+          </div>
         </div>
         <div class="toolbar">
           <input type="text" class="search-input" id="leadReprSearch" placeholder="Buscar por cliente, CPF ou WhatsApp..." />
@@ -714,7 +725,7 @@ tbody tr:last-child td{border-bottom:none;}
 
       <!-- ============ ASSINATURA DE CONTRATO ============ -->
       <section class="view" id="view-assinatura-contrato">
-        <p class="helper-text">Alunos aprovados na venda entram aqui automaticamente. Ao marcar como "Concluído", o aluno passa para a Cobrança.</p>
+        <p class="helper-text">Alunos aprovados na venda entram aqui automaticamente. Ao marcar como "Assinado", o aluno passa para a Cobrança. "Cancelado" envia o registro para Leads Reprovados.</p>
         <div class="toolbar"><input type="text" class="search-input" id="assContSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
         <div class="table-wrap">
           <table>
@@ -2244,12 +2255,37 @@ async function fetchLeadsReprovados(){
 }
 async function renderLeadsReprovados(){
   state.leadsReprovados = await fetchLeadsReprovados();
+  buildLeadsReprovadosToolbarOnce();
   drawMotivosReprovacaoChart();
+  drawReprovadosPorMesChart();
   drawLeadsReprovadosTable();
 }
+function buildLeadsReprovadosToolbarOnce(){
+  if(document.getElementById('leadReprFiltroMes').options.length) return;
+  const now = new Date();
+  const anos = []; for(let a=now.getFullYear()-2; a<=now.getFullYear()+1; a++) anos.push(a);
+  document.getElementById('leadReprFiltroMes').innerHTML = `<option value="">Mês: Todos</option>` + MESES.map((m,i)=>`<option value="${i+1}">${m}</option>`).join('');
+  document.getElementById('leadReprFiltroAno').innerHTML = anos.map(a=>`<option value="${a}" ${a===now.getFullYear()?'selected':''}>${a}</option>`).join('');
+  document.getElementById('leadReprFiltroMes').addEventListener('change', ()=>{ drawMotivosReprovacaoChart(); drawLeadsReprovadosTable(); });
+  document.getElementById('leadReprFiltroAno').addEventListener('change', ()=>{ drawMotivosReprovacaoChart(); drawReprovadosPorMesChart(); drawLeadsReprovadosTable(); });
+}
+/* Filtra pelo Ano sempre, e pelo Mês quando selecionado (usa updated_at = data em que foi marcado como reprovado) */
+function leadsReprovadosFiltrados(aplicarMes){
+  const fMes = document.getElementById('leadReprFiltroMes').value;
+  const fAno = document.getElementById('leadReprFiltroAno').value;
+  return state.leadsReprovados.filter(o=>{
+    const ref = o.updated_at || o.data_abertura;
+    if(!ref) return !fAno;
+    const d = new Date(ref);
+    if(fAno && d.getFullYear() !== Number(fAno)) return false;
+    if(aplicarMes && fMes && (d.getMonth()+1) !== Number(fMes)) return false;
+    return true;
+  });
+}
 function drawMotivosReprovacaoChart(){
+  const rows = leadsReprovadosFiltrados(true);
   const counts = {};
-  state.leadsReprovados.forEach(o=>{
+  rows.forEach(o=>{
     const nome = o.motivo?.nome || 'Sem motivo informado';
     counts[nome] = (counts[nome]||0) + 1;
   });
@@ -2257,20 +2293,41 @@ function drawMotivosReprovacaoChart(){
   const data = Object.values(counts);
   destroyChart('motivosRepr');
   state.charts.motivosRepr = new Chart(document.getElementById('chartMotivosReprovacao'), {
-    type: 'bar',
-    data: { labels, datasets: [{ data, backgroundColor:'#d64545', borderRadius:4 }] },
+    type: 'pie',
+    data: { labels, datasets: [{ data, backgroundColor: CHART_PALETTE }] },
     options: {
-      indexAxis: 'y',
       responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:(c)=> c.parsed.x + ' lead' + (c.parsed.x===1?'':'s') } } },
-      scales:{ x:{ beginAtZero:true, ticks:{ precision:0, font:{size:10} } }, y:{ ticks:{ font:{size:10.5} } } }
+      plugins:{
+        legend:{ position:'bottom', labels:{ boxWidth:11, font:{size:10.5} } },
+        tooltip:{ callbacks:{ label:(c)=> `${c.label}: ${c.parsed} lead${c.parsed===1?'':'s'}` } }
+      }
+    }
+  });
+}
+function drawReprovadosPorMesChart(){
+  const fAno = Number(document.getElementById('leadReprFiltroAno').value);
+  const counts = new Array(12).fill(0);
+  state.leadsReprovados.forEach(o=>{
+    const ref = o.updated_at || o.data_abertura;
+    if(!ref) return;
+    const d = new Date(ref);
+    if(d.getFullYear() === fAno) counts[d.getMonth()]++;
+  });
+  destroyChart('reprPorMes');
+  state.charts.reprPorMes = new Chart(document.getElementById('chartReprovadosPorMes'), {
+    type: 'bar',
+    data: { labels: MESES.map(m=>m.slice(0,3)), datasets: [{ data: counts, backgroundColor:'#d64545', borderRadius:4 }] },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:(c)=> c.parsed.y + ' lead' + (c.parsed.y===1?'':'s') } } },
+      scales:{ y:{ beginAtZero:true, ticks:{ precision:0, font:{size:9} } }, x:{ ticks:{ font:{size:9} } } }
     },
     plugins:[BAR_VALUE_LABELS_PLUGIN]
   });
 }
 function drawLeadsReprovadosTable(){
   const search = document.getElementById('leadReprSearch').value.toLowerCase();
-  const rows = state.leadsReprovados.filter(o=>{
+  const rows = leadsReprovadosFiltrados(true).filter(o=>{
     if(!search) return true;
     const blob = `${o.cliente||''} ${o.cpf||''} ${o.whatsapp||''}`.toLowerCase();
     return blob.includes(search);
@@ -2577,16 +2634,45 @@ document.getElementById('btnSalvarFollowup').addEventListener('click', async ()=
 });
 
 /* ---------- Modal de motivo rápido (reprovar direto pela lista) ---------- */
-let motivoRapidoContext = 'orcamento'; // 'orcamento' ou 'cliente'
+let motivoRapidoContext = 'orcamento'; // 'orcamento' | 'cliente' | 'cancelar'
 function openMotivoRapidoModal(id, contexto){
   motivoRapidoContext = contexto || 'orcamento';
   document.getElementById('motivoRapidoOrcId').value = id;
   fillSelect('motivoRapidoSelect', state.motivos.filter(m=>m.ativo), 'Selecione o motivo');
   openModal('modalMotivoRapido');
 }
+/* Mapa: view atual -> função de render, usado para atualizar a tela certa após um Cancelar */
+const PIPELINE_RENDER_BY_VIEW = {
+  'enviados':()=>renderEnviados(), 'aprovados':()=>renderAprovados(),
+  'assinatura-contrato':()=>renderAssinaturaContrato(), 'cobranca-contrato':()=>renderCobrancaContrato(),
+  'exames':()=>renderExames(), 'conferencia':()=>renderConferencia(), 'alunos-reprovados':()=>renderAlunosReprovados(),
+  'cobranca':()=>renderCobranca(), 'aulas':()=>renderAulas(), 'agendados':()=>renderAgendados(),
+  'cobranca-curso':()=>renderCobrancaCurso(), 'prova-escrita-agendamento':()=>renderProvaEscritaAgendamento(),
+  'prova-escrita-aguardando':()=>renderProvaEscritaAguardando(), 'prova-escrita-reprovado':()=>renderProvaEscritaReprovado(),
+  'conferencia-cobranca':()=>renderConferenciaCobranca(), 'teste-pratico':()=>renderTestePratico(),
+  'resultado-teste':()=>renderResultadoTeste(), 'teste-volante-resultado':()=>renderTesteVolanteResultado()
+};
+async function refreshCurrentPipelineView(){
+  const fn = PIPELINE_RENDER_BY_VIEW[state.currentView];
+  if(fn) await fn();
+}
+async function cancelarRegistroPipeline(id, motivoId){
+  const payload = {
+    situacao:'Reprovado', motivo_reprovado_id: motivoId,
+    situacao_cliente:'Reprovado', motivo_reprovado_cliente_id: motivoId,
+    etapa:null, situacao_etapa:null,
+    updated_at: new Date().toISOString()
+  };
+  const { error } = await sb.from('orcamentos').update(payload).eq('id', id);
+  if(error){ showToast('Erro ao cancelar: '+error.message, true); await refreshCurrentPipelineView(); return; }
+  showToast('Cancelado e movido para Leads Reprovados.');
+  await renderLeadsReprovados();
+  await refreshCurrentPipelineView();
+}
 document.querySelectorAll('#modalMotivoRapido [data-close]').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     if(motivoRapidoContext === 'cliente'){ drawEnviadosTable(); drawAprovadosTable(); }
+    else if(motivoRapidoContext === 'cancelar'){ refreshCurrentPipelineView(); }
     else { drawOrcamentosTable(); }
   });
 });
@@ -2595,6 +2681,8 @@ document.getElementById('btnConfirmarReprovacao').addEventListener('click', asyn
   const motivo = document.getElementById('motivoRapidoSelect').value || null;
   if(motivoRapidoContext === 'cliente'){
     await updateSituacaoClienteRapida(id, { situacao_cliente:'Reprovado', motivo_reprovado_cliente_id: motivo, data_aprovacao: null, etapa:null, situacao_etapa:null });
+  } else if(motivoRapidoContext === 'cancelar'){
+    await cancelarRegistroPipeline(id, motivo);
   } else {
     await updateSituacaoRapida(id, { situacao:'Reprovado', motivo_reprovado_id: motivo }, [renderOrcamentos, renderLeadsReprovados]);
   }
@@ -2711,11 +2799,15 @@ function drawEnviadosTable(){
         <button title="Voltar para Leads (desfazer envio)" class="danger" data-revert="${o.id}">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
         </button>
-      </td>
+      
+        <button title="Cancelar" class="danger" data-cancelar="${o.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
+        </button></td>
     </tr>
   `).join('');
   tbody.querySelectorAll('[data-editenv]').forEach(b=> b.addEventListener('click', ()=> openEnviadoModal(b.dataset.editenv)));
   tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-cancelar]').forEach(b=> b.addEventListener('click', ()=> openMotivoRapidoModal(b.dataset.cancelar, 'cancelar')));
   tbody.querySelectorAll('[data-revert]').forEach(b=> b.addEventListener('click', ()=> revertEnviado(b.dataset.revert)));
   tbody.querySelectorAll('[data-situacao-cliente-select]').forEach(sel=>{
     sel.addEventListener('change', (e)=> quickChangeSituacaoCliente(sel.dataset.situacaoClienteSelect, e.target.value));
@@ -2852,11 +2944,15 @@ function drawAprovadosTable(){
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
         </button>
         ${o.etapa ? '' : `<button class="btn btn-sm btn-yellow" data-enviar-exame="${o.id}">Enviar para Assinatura de Contrato</button>`}
-      </td>
+      
+        <button title="Cancelar" class="danger" data-cancelar="${o.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
+        </button></td>
     </tr>
   `).join('');
   tbody.querySelectorAll('[data-editenv]').forEach(b=> b.addEventListener('click', ()=> openEnviadoModal(b.dataset.editenv)));
   tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-cancelar]').forEach(b=> b.addEventListener('click', ()=> openMotivoRapidoModal(b.dataset.cancelar, 'cancelar')));
   tbody.querySelectorAll('[data-situacao-cliente-select]').forEach(sel=>{
     sel.addEventListener('change', (e)=> quickChangeSituacaoCliente(sel.dataset.situacaoClienteSelect, e.target.value));
   });
@@ -2937,7 +3033,7 @@ function drawAssinaturaContratoTable(){
   tbody.innerHTML = rows.map(o=>`
     <tr>
       <td>${o.cliente||''}</td><td>${o.whatsapp||'—'}</td><td>${fmtMoney(o.valor)}</td><td>${o.vendedor?.nome||'—'}</td>
-      <td>${simpleSelectHtml(o, ['Em Andamento','Concluído'], 'asscont-select', {'Em Andamento':'sit-enviado','Concluído':'sit-aprovado'})}</td>
+      <td>${simpleSelectHtml(o, ['Aguardando assinatura','Assinado','Cancelado'], 'asscont-select', {'Aguardando assinatura':'sit-enviado','Assinado':'sit-aprovado','Cancelado':'sit-reprovado'}, 'Aguardando assinatura')}</td>
       <td>${leadTimeCell(o.etapa_entrada||o.updated_at)}</td>
       <td>${firstFollowupCell(o)}</td>
       <td class="row-actions"><button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button></td>
@@ -2948,12 +3044,16 @@ function drawAssinaturaContratoTable(){
 }
 document.getElementById('assContSearch').addEventListener('input', drawAssinaturaContratoTable);
 async function quickChangeAssinaturaContrato(id, novoValor){
-  if(novoValor === 'Concluído'){
-    if(!confirm('Marcar como concluído? O aluno seguirá para a Cobrança.')){ drawAssinaturaContratoTable(); return; }
+  if(novoValor === 'Assinado'){
+    if(!confirm('Marcar como assinado? O aluno seguirá para a Cobrança.')){ drawAssinaturaContratoTable(); return; }
     await updatePipeline(id, { etapa:'cobranca_contrato', situacao_etapa:null, data_assinatura_contrato: todayISO() }, [renderAssinaturaContrato, renderCobrancaContrato]);
-  } else {
-    await updatePipeline(id, { situacao_etapa:'Em Andamento' }, [renderAssinaturaContrato]);
+    return;
   }
+  if(novoValor === 'Cancelado'){
+    openMotivoRapidoModal(id, 'cancelar');
+    return;
+  }
+  await updatePipeline(id, { situacao_etapa:'Aguardando assinatura' }, [renderAssinaturaContrato]);
 }
 
 /* ---------- 0b) COBRANÇA (CONTRATO) ---------- */
@@ -2976,10 +3076,14 @@ function drawCobrancaContratoTable(){
       <td class="row-actions">
         <button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button>
         ${o.data_pagamento_contrato ? '' : `<button class="btn btn-sm btn-yellow" data-pagar="${o.id}">Marcar como Pago</button>`}
-      </td>
+      
+        <button title="Cancelar" class="danger" data-cancelar="${o.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
+        </button></td>
     </tr>
   `).join('');
   tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-cancelar]').forEach(b=> b.addEventListener('click', ()=> openMotivoRapidoModal(b.dataset.cancelar, 'cancelar')));
   tbody.querySelectorAll('[data-pagar]').forEach(b=> b.addEventListener('click', ()=> openPagamentoContratoModal(b.dataset.pagar)));
 }
 document.getElementById('cobContSearch').addEventListener('input', drawCobrancaContratoTable);
@@ -3015,10 +3119,14 @@ function drawExamesTable(){
       <td>${simpleSelectHtml(o, ['Em Andamento','Concluído'], 'exame-select', {'Em Andamento':'sit-enviado','Concluído':'sit-aprovado'})}</td>
       <td>${leadTimeCell(o.etapa_entrada||o.updated_at)}</td>
       <td>${firstFollowupCell(o)}</td>
-      <td class="row-actions"><button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button></td>
+      <td class="row-actions"><button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button>
+        <button title="Cancelar" class="danger" data-cancelar="${o.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
+        </button></td>
     </tr>
   `).join('');
   tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-cancelar]').forEach(b=> b.addEventListener('click', ()=> openMotivoRapidoModal(b.dataset.cancelar, 'cancelar')));
   tbody.querySelectorAll('[data-exame-select]').forEach(sel=> sel.addEventListener('change', (e)=> quickChangeExame(sel.dataset.exameSelect, e.target.value)));
 }
 document.getElementById('exaSearch').addEventListener('input', drawExamesTable);
@@ -3049,10 +3157,14 @@ function drawConferenciaTable(){
       <td>${simpleSelectHtml(o, ['Em Andamento','Aprovado','Reprovado'], 'conf-select', {'Em Andamento':'sit-enviado','Aprovado':'sit-aprovado','Reprovado':'sit-reprovado'})}</td>
       <td>${o.motivo_reprovacao_exame || '—'}</td>
       <td>${leadTimeCell(o.etapa_entrada||o.updated_at)}</td>
-      <td class="row-actions"><button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button></td>
+      <td class="row-actions"><button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button>
+        <button title="Cancelar" class="danger" data-cancelar="${o.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
+        </button></td>
     </tr>
   `).join('');
   tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-cancelar]').forEach(b=> b.addEventListener('click', ()=> openMotivoRapidoModal(b.dataset.cancelar, 'cancelar')));
   tbody.querySelectorAll('[data-conf-select]').forEach(sel=> sel.addEventListener('change', (e)=> quickChangeConferencia(sel.dataset.confSelect, e.target.value)));
 }
 document.getElementById('confSearch').addEventListener('input', drawConferenciaTable);
@@ -3097,10 +3209,14 @@ function drawAlunosReprovadosTable(){
       <td>${o.cliente||''}</td><td>${o.whatsapp||'—'}</td><td>${o.motivo_reprovacao_exame||'—'}</td>
       <td>${simpleSelectHtml(o, ['Em Andamento','Concluído'], 'repr-select', {'Em Andamento':'sit-enviado','Concluído':'sit-aprovado'})}</td>
       <td>${leadTimeCell(o.etapa_entrada||o.updated_at)}</td>
-      <td class="row-actions"><button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button></td>
+      <td class="row-actions"><button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button>
+        <button title="Cancelar" class="danger" data-cancelar="${o.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
+        </button></td>
     </tr>
   `).join('');
   tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-cancelar]').forEach(b=> b.addEventListener('click', ()=> openMotivoRapidoModal(b.dataset.cancelar, 'cancelar')));
   tbody.querySelectorAll('[data-repr-select]').forEach(sel=> sel.addEventListener('change', (e)=> quickChangeReprovado(sel.dataset.reprSelect, e.target.value)));
 }
 document.getElementById('reprSearch').addEventListener('input', drawAlunosReprovadosTable);
@@ -3133,10 +3249,14 @@ function drawCobrancaTable(){
       <td class="row-actions">
         <button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button>
         ${o.data_pagamento ? '' : `<button class="btn btn-sm btn-yellow" data-pagar="${o.id}">Marcar como Pago</button>`}
-      </td>
+      
+        <button title="Cancelar" class="danger" data-cancelar="${o.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
+        </button></td>
     </tr>
   `).join('');
   tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-cancelar]').forEach(b=> b.addEventListener('click', ()=> openMotivoRapidoModal(b.dataset.cancelar, 'cancelar')));
   tbody.querySelectorAll('[data-pagar]').forEach(b=> b.addEventListener('click', ()=> openPagamentoModal(b.dataset.pagar)));
 }
 document.getElementById('cobSearch').addEventListener('input', drawCobrancaTable);
@@ -3176,10 +3296,14 @@ function drawAulasTable(){
       <td class="row-actions">
         <button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button>
         <button class="btn btn-sm btn-yellow" data-agendar="${o.id}">Agendar</button>
-      </td>
+      
+        <button title="Cancelar" class="danger" data-cancelar="${o.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
+        </button></td>
     </tr>
   `).join('');
   tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-cancelar]').forEach(b=> b.addEventListener('click', ()=> openMotivoRapidoModal(b.dataset.cancelar, 'cancelar')));
   tbody.querySelectorAll('[data-agendar]').forEach(b=> b.addEventListener('click', ()=> openAgendarAulaModal(b.dataset.agendar)));
 }
 document.getElementById('aulSearch').addEventListener('input', drawAulasTable);
@@ -3249,10 +3373,14 @@ function drawAgendadosTable(){
       <td>${o.cliente||''}</td><td>${o.turma||'—'}</td><td>${fmtDate(o.data_aula_agendada)}</td><td>${o.numero_aulas||0}</td>
       <td>${simpleSelectHtml(o, ['Pendente','Aprovado','Reprovado'], 'agd-select', {'Pendente':'sit-aberto','Aprovado':'sit-aprovado','Reprovado':'sit-reprovado'}, 'Pendente')}</td>
       <td>${leadTimeCell(o.etapa_entrada||o.updated_at)}</td>
-      <td class="row-actions"><button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button></td>
+      <td class="row-actions"><button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button>
+        <button title="Cancelar" class="danger" data-cancelar="${o.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
+        </button></td>
     </tr>
   `).join('');
   tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-cancelar]').forEach(b=> b.addEventListener('click', ()=> openMotivoRapidoModal(b.dataset.cancelar, 'cancelar')));
   tbody.querySelectorAll('[data-agd-select]').forEach(sel=> sel.addEventListener('change', (e)=> quickChangeAgendado(sel.dataset.agdSelect, e.target.value)));
 }
 async function quickChangeAgendado(id, novoValor){
@@ -3289,10 +3417,14 @@ function drawCobrancaCursoTable(){
       <td class="row-actions">
         <button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button>
         ${o.data_pagamento_curso ? '' : `<button class="btn btn-sm btn-yellow" data-pagar="${o.id}">Marcar como Pago</button>`}
-      </td>
+      
+        <button title="Cancelar" class="danger" data-cancelar="${o.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
+        </button></td>
     </tr>
   `).join('');
   tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-cancelar]').forEach(b=> b.addEventListener('click', ()=> openMotivoRapidoModal(b.dataset.cancelar, 'cancelar')));
   tbody.querySelectorAll('[data-pagar]').forEach(b=> b.addEventListener('click', ()=> openPagamentoCursoModal(b.dataset.pagar)));
 }
 document.getElementById('cobCursoSearch').addEventListener('input', drawCobrancaCursoTable);
@@ -3330,10 +3462,14 @@ function drawProvaEscritaAgendamentoTable(){
       <td class="row-actions">
         <button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button>
         <button class="btn btn-sm btn-yellow" data-agendar="${o.id}">Agendar</button>
-      </td>
+      
+        <button title="Cancelar" class="danger" data-cancelar="${o.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
+        </button></td>
     </tr>
   `).join('');
   tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-cancelar]').forEach(b=> b.addEventListener('click', ()=> openMotivoRapidoModal(b.dataset.cancelar, 'cancelar')));
   tbody.querySelectorAll('[data-agendar]').forEach(b=> b.addEventListener('click', ()=> openAgendarProvaModal(b.dataset.agendar)));
 }
 document.getElementById('provaAgSearch').addEventListener('input', drawProvaEscritaAgendamentoTable);
@@ -3369,10 +3505,14 @@ function drawProvaEscritaAguardandoTable(){
       <td>${o.cliente||''}</td><td>${fmtDate(o.data_prova_escrita)}</td><td>${o.hora_prova_escrita||'—'}</td>
       <td>${simpleSelectHtml(o, ['Pendente','Aprovado','Reprovado'], 'provaagd-select', {'Pendente':'sit-aberto','Aprovado':'sit-aprovado','Reprovado':'sit-reprovado'}, 'Pendente')}</td>
       <td>${leadTimeCell(o.etapa_entrada||o.updated_at)}</td>
-      <td class="row-actions"><button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button></td>
+      <td class="row-actions"><button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button>
+        <button title="Cancelar" class="danger" data-cancelar="${o.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
+        </button></td>
     </tr>
   `).join('');
   tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-cancelar]').forEach(b=> b.addEventListener('click', ()=> openMotivoRapidoModal(b.dataset.cancelar, 'cancelar')));
   tbody.querySelectorAll('[data-provaagd-select]').forEach(sel=> sel.addEventListener('change', (e)=> quickChangeProvaEscritaAguardando(sel.dataset.provaagdSelect, e.target.value)));
 }
 document.getElementById('provaAgdSearch').addEventListener('input', drawProvaEscritaAguardandoTable);
@@ -3410,10 +3550,14 @@ function drawProvaEscritaReprovadoTable(){
       <td class="row-actions">
         <button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button>
         <button class="btn btn-sm btn-yellow" data-reprogramar="${o.id}">Reprogramar</button>
-      </td>
+      
+        <button title="Cancelar" class="danger" data-cancelar="${o.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
+        </button></td>
     </tr>
   `).join('');
   tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-cancelar]').forEach(b=> b.addEventListener('click', ()=> openMotivoRapidoModal(b.dataset.cancelar, 'cancelar')));
   tbody.querySelectorAll('[data-reprogramar]').forEach(b=> b.addEventListener('click', ()=> reprogramarProvaEscrita(b.dataset.reprogramar)));
 }
 document.getElementById('provaReprSearch').addEventListener('input', drawProvaEscritaReprovadoTable);
@@ -3442,10 +3586,14 @@ function drawConferenciaCobrancaTable(){
       <td class="row-actions">
         <button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button>
         <button class="btn btn-sm btn-yellow" data-confirmar="${o.id}">Enviar para Aulas Práticas</button>
-      </td>
+      
+        <button title="Cancelar" class="danger" data-cancelar="${o.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
+        </button></td>
     </tr>
   `).join('');
   tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-cancelar]').forEach(b=> b.addEventListener('click', ()=> openMotivoRapidoModal(b.dataset.cancelar, 'cancelar')));
   tbody.querySelectorAll('[data-confirmar]').forEach(b=> b.addEventListener('click', ()=> confirmarConferenciaCobranca(b.dataset.confirmar)));
 }
 document.getElementById('confCobSearch').addEventListener('input', drawConferenciaCobrancaTable);
@@ -3474,10 +3622,14 @@ function drawTestePraticoTable(){
       <td class="row-actions">
         <button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button>
         <button class="btn btn-sm btn-yellow" data-agendar="${o.id}">Agendar</button>
-      </td>
+      
+        <button title="Cancelar" class="danger" data-cancelar="${o.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
+        </button></td>
     </tr>
   `).join('');
   tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-cancelar]').forEach(b=> b.addEventListener('click', ()=> openMotivoRapidoModal(b.dataset.cancelar, 'cancelar')));
   tbody.querySelectorAll('[data-agendar]').forEach(b=> b.addEventListener('click', ()=> openAgendarTesteModal(b.dataset.agendar)));
 }
 document.getElementById('tstSearch').addEventListener('input', drawTestePraticoTable);
@@ -3540,10 +3692,14 @@ function drawResultadoTesteTable(){
       <td class="row-actions">
         <button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button>
         <button class="btn btn-sm btn-yellow" data-agendar="${o.id}">Agendar</button>
-      </td>
+      
+        <button title="Cancelar" class="danger" data-cancelar="${o.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
+        </button></td>
     </tr>
   `).join('');
   tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-cancelar]').forEach(b=> b.addEventListener('click', ()=> openMotivoRapidoModal(b.dataset.cancelar, 'cancelar')));
   tbody.querySelectorAll('[data-agendar]').forEach(b=> b.addEventListener('click', ()=> openAgendarVolanteModal(b.dataset.agendar)));
 }
 function openAgendarVolanteModal(id){
@@ -3578,10 +3734,14 @@ function drawTesteVolanteResultadoTable(){
       <td>${o.cliente||''}</td><td>${fmtDate(o.data_teste_volante)}</td><td>${o.hora_teste_volante||'—'}</td>
       <td>${simpleSelectHtml(o, ['Pendente','Aprovado','Reprovado'], 'volres-select', {'Pendente':'sit-aberto','Aprovado':'sit-aprovado','Reprovado':'sit-reprovado'}, 'Pendente')}</td>
       <td>${leadTimeCell(o.etapa_entrada||o.updated_at)}</td>
-      <td class="row-actions"><button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button></td>
+      <td class="row-actions"><button title="Ligações / Follow-up" data-followup="${o.id}">${ICON_PHONE}</button>
+        <button title="Cancelar" class="danger" data-cancelar="${o.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
+        </button></td>
     </tr>
   `).join('');
   tbody.querySelectorAll('[data-followup]').forEach(b=> b.addEventListener('click', ()=> openFollowupModal(b.dataset.followup)));
+  tbody.querySelectorAll('[data-cancelar]').forEach(b=> b.addEventListener('click', ()=> openMotivoRapidoModal(b.dataset.cancelar, 'cancelar')));
   tbody.querySelectorAll('[data-volres-select]').forEach(sel=> sel.addEventListener('change', (e)=> quickChangeTesteVolanteResultado(sel.dataset.volresSelect, e.target.value)));
 }
 document.getElementById('volResSearch').addEventListener('input', drawTesteVolanteResultadoTable);
