@@ -139,12 +139,13 @@ input,select,textarea{font-family:inherit;}
 .error-msg{color:var(--danger);font-size:13px;margin-top:10px;min-height:16px;}
 
 /* ---------- App shell ---------- */
-#appShell{display:flex;min-height:100vh;}
+#appShell{display:flex;height:100vh;overflow:hidden;}
 .sidebar{
   width:250px;flex-shrink:0;
   background:linear-gradient(180deg,var(--blue-900),var(--blue-800));
   color:#fff;
   display:flex;flex-direction:column;
+  min-height:0;
   transition:width .18s ease;
   position:relative;
   z-index:20;
@@ -189,19 +190,36 @@ input,select,textarea{font-family:inherit;}
 .nav-item.active{background:rgba(255,255,255,0.12);color:#fff;border-left-color:var(--yellow-500);font-weight:600;}
 .sidebar.collapsed .nav-item span{display:none;}
 .sidebar-footer{padding:14px 16px;border-top:1px solid rgba(255,255,255,0.12);}
-.main-area{flex:1;display:flex;flex-direction:column;min-width:0;}
+.main-area{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0;}
 .topbar{
   height:62px;background:var(--surface);border-bottom:1px solid var(--border);
   display:flex;align-items:center;padding:0 24px;justify-content:space-between;
   position:sticky;top:0;z-index:10;
+  flex-shrink:0;
 }
 .topbar h1{font-size:18px;margin:0;color:var(--blue-800);}
 .topbar .user-chip{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--text-muted);}
 .topbar .avatar{width:32px;height:32px;border-radius:50%;background:var(--blue-700);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;}
-.content{padding:24px;flex:1;overflow-x:auto;}
+.content{padding:24px;flex:1;overflow-x:auto;min-height:0;}
 .view{display:none;}
 .view.active{display:block;animation:fadeIn .18s ease;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+/* ---------- List pages: header/filters/table-head fixed, only rows scroll ---------- */
+.view.list-view.active{
+  display:flex;
+  flex-direction:column;
+  height:calc(100vh - 62px - 48px); /* viewport minus topbar (62px) minus .content vertical padding (24px*2) */
+  min-height:0;
+}
+.view.list-view.active > *{flex-shrink:0;}
+.view.list-view.active > .table-wrap,
+.view.list-view.active > .view-scroll{
+  flex:1 1 auto;
+  min-height:120px;
+  overflow:auto;
+  margin-bottom:0;
+}
 
 /* ---------- Cards / dashboard ---------- */
 .card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;}
@@ -343,11 +361,13 @@ tbody tr:last-child td{border-bottom:none;}
   @page{ size: A4 landscape; margin: 12mm; }
   html,body{height:auto;background:#fff;}
   #loginScreen,.sidebar,.topbar,.toolbar,.legend-row,.modal-overlay,#toastContainer,.no-print{display:none !important;}
-  #appShell{display:block;min-height:0;}
+  #appShell{display:block;height:auto;min-height:0;overflow:visible;}
   .main-area{display:block;}
-  .content{padding:0;overflow:visible;}
+  .content{padding:0;overflow:visible;min-height:0;}
   .view{display:none !important;}
-  .view.active{display:block !important;}
+  .view.active{display:block !important;height:auto !important;}
+  .view.list-view .table-wrap,
+  .view.list-view .view-scroll{overflow:visible !important;max-height:none !important;}
   .print-header{
     display:flex;align-items:flex-end;justify-content:space-between;
     border-bottom:2px solid #0d4a6e;padding-bottom:10px;margin-bottom:14px;
@@ -597,43 +617,49 @@ tbody tr:last-child td{border-bottom:none;}
       <div class="print-header" id="printHeader"></div>
 
       <!-- ============ DASHBOARD ============ -->
-      <section class="view" id="view-dashboard">
+      <section class="view list-view" id="view-dashboard">
         <div class="toolbar" id="dashboardToolbar"></div>
         <div class="stat-grid" id="dashboardStats"></div>
 
-        <div class="gauge-grid">
-          <div class="gauge-card">
-            <div class="gauge-title">Propostas Enviadas</div>
-            <div class="gauge-canvas-wrap"><canvas id="gaugePropostas"></canvas></div>
-            <div class="gauge-meta" id="gaugePropostasMeta">—</div>
+        <div class="view-scroll">
+          <div class="gauge-grid">
+            <div class="gauge-card">
+              <div class="gauge-title">Propostas Enviadas</div>
+              <div class="gauge-canvas-wrap"><canvas id="gaugePropostas"></canvas></div>
+              <div class="gauge-meta" id="gaugePropostasMeta">—</div>
+            </div>
+            <div class="gauge-card">
+              <div class="gauge-title">Contatos Realizados</div>
+              <div class="gauge-canvas-wrap"><canvas id="gaugeContatos"></canvas></div>
+              <div class="gauge-meta" id="gaugeContatosMeta">—</div>
+            </div>
+            <div class="gauge-card">
+              <div class="gauge-title">Aprovados</div>
+              <div class="gauge-canvas-wrap"><canvas id="gaugeAprovados"></canvas></div>
+              <div class="gauge-meta" id="gaugeAprovadosMeta">—</div>
+            </div>
           </div>
-          <div class="gauge-card">
-            <div class="gauge-title">Contatos Realizados</div>
-            <div class="gauge-canvas-wrap"><canvas id="gaugeContatos"></canvas></div>
-            <div class="gauge-meta" id="gaugeContatosMeta">—</div>
-          </div>
-          <div class="gauge-card">
-            <div class="gauge-title">Aprovados</div>
-            <div class="gauge-canvas-wrap"><canvas id="gaugeAprovados"></canvas></div>
-            <div class="gauge-meta" id="gaugeAprovadosMeta">—</div>
-          </div>
-        </div>
 
-        <div class="mini-chart-grid">
-          <div class="mini-chart-card"><div class="mini-chart-title" id="miniQtdTitle">Qtd: Orç. x Aprov.</div><div class="mini-chart-canvas-wrap"><canvas id="chartQtd"></canvas></div></div>
-          <div class="mini-chart-card"><div class="mini-chart-title" id="miniValorTitle">Valor: Orç. x Aprov.</div><div class="mini-chart-canvas-wrap"><canvas id="chartValor"></canvas></div></div>
-          <div class="mini-chart-card"><div class="mini-chart-title">Por Origem</div><div class="mini-chart-canvas-wrap"><canvas id="chartOrigem"></canvas></div></div>
-          <div class="mini-chart-card"><div class="mini-chart-title">Aprovados (Ano)</div><div class="mini-chart-canvas-wrap"><canvas id="chartAnual"></canvas></div></div>
-        </div>
+          <div class="mini-chart-grid" style="grid-template-columns:repeat(3,1fr);">
+            <div class="mini-chart-card"><div class="mini-chart-title" id="miniQtdTitle">Qtd: Orç. x Aprov.</div><div class="mini-chart-canvas-wrap"><canvas id="chartQtd"></canvas></div></div>
+            <div class="mini-chart-card"><div class="mini-chart-title" id="miniValorTitle">Valor: Orç. x Aprov.</div><div class="mini-chart-canvas-wrap"><canvas id="chartValor"></canvas></div></div>
+            <div class="mini-chart-card"><div class="mini-chart-title">Aprovados (Ano)</div><div class="mini-chart-canvas-wrap"><canvas id="chartAnual"></canvas></div></div>
+          </div>
 
-        <div class="card" style="margin-top:16px;">
-          <div class="mini-chart-title" style="margin-bottom:10px;">Funil de Etapas · Alunos por Fase</div>
-          <div style="position:relative;height:560px;"><canvas id="chartFunil"></canvas></div>
+          <div class="card" style="margin-top:16px;">
+            <div class="mini-chart-title" style="margin-bottom:10px;" id="funilOrigemTitle">Funil de Origem dos Leads</div>
+            <div style="position:relative;height:260px;"><canvas id="chartOrigem"></canvas></div>
+          </div>
+
+          <div class="card" style="margin-top:16px;">
+            <div class="mini-chart-title" style="margin-bottom:10px;">Funil de Etapas · Alunos por Fase</div>
+            <div style="position:relative;height:560px;"><canvas id="chartFunil"></canvas></div>
+          </div>
         </div>
       </section>
 
       <!-- ============ ORÇAMENTOS ============ -->
-      <section class="view" id="view-orcamentos">
+      <section class="view list-view" id="view-orcamentos">
         <div id="orcStatsRow" class="mini-chart-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;"></div>
         <div class="toolbar">
           <input type="text" class="search-input" id="orcSearch" placeholder="Buscar por cliente, CPF ou WhatsApp..." />
@@ -664,7 +690,7 @@ tbody tr:last-child td{border-bottom:none;}
       </section>
 
       <!-- ============ LEADS REPROVADOS ============ -->
-      <section class="view" id="view-leads-reprovados">
+      <section class="view list-view" id="view-leads-reprovados">
         <div id="leadReprStatsRow" class="mini-chart-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;"></div>
         <div class="toolbar">
           <select id="leadReprFiltroMes"></select>
@@ -697,7 +723,7 @@ tbody tr:last-child td{border-bottom:none;}
       </section>
 
       <!-- ============ ENVIADO AO CLIENTE ============ -->
-      <section class="view" id="view-enviados">
+      <section class="view list-view" id="view-enviados">
         <div id="envStatsRow" class="mini-chart-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;"></div>
         <div class="toolbar">
           <input type="text" class="search-input" id="envSearch" placeholder="Buscar por cliente, CPF ou WhatsApp..." />
@@ -720,7 +746,7 @@ tbody tr:last-child td{border-bottom:none;}
       </section>
 
       <!-- ============ APROVADOS ============ -->
-      <section class="view" id="view-aprovados">
+      <section class="view list-view" id="view-aprovados">
         <div id="aprStatsRow" class="mini-chart-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;"></div>
         <div class="toolbar">
           <input type="text" class="search-input" id="aprSearch" placeholder="Buscar por cliente, CPF ou WhatsApp..." />
@@ -745,7 +771,7 @@ tbody tr:last-child td{border-bottom:none;}
       </section>
 
       <!-- ============ ASSINATURA DE CONTRATO ============ -->
-      <section class="view" id="view-assinatura-contrato">
+      <section class="view list-view" id="view-assinatura-contrato">
         <div id="assContStatsRow" class="mini-chart-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;"></div>
         <p class="helper-text">Alunos aprovados na venda entram aqui automaticamente. Ao marcar como "Assinado", o aluno passa para a Cobrança. "Cancelado" envia o registro para Leads Reprovados.</p>
         <div class="toolbar"><input type="text" class="search-input" id="assContSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
@@ -758,7 +784,7 @@ tbody tr:last-child td{border-bottom:none;}
       </section>
 
       <!-- ============ COBRANÇA (CONTRATO) ============ -->
-      <section class="view" id="view-cobranca-contrato">
+      <section class="view list-view" id="view-cobranca-contrato">
         <div id="cobContStatsRow" class="mini-chart-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;"></div>
         <p class="helper-text">Ao marcar como pago, o aluno segue para o Exame Médico e Psico.</p>
         <div class="toolbar"><input type="text" class="search-input" id="cobContSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
@@ -771,7 +797,7 @@ tbody tr:last-child td{border-bottom:none;}
       </section>
 
       <!-- ============ EXAME MÉDICO E PSICO ============ -->
-      <section class="view" id="view-exames">
+      <section class="view list-view" id="view-exames">
         <div id="exaStatsRow" class="mini-chart-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;"></div>
         <p class="helper-text">Alunos com contrato assinado e cobrança paga entram aqui automaticamente. Ao marcar como "Concluído", o aluno passa para a Conferência de Resultados.</p>
         <div class="toolbar"><input type="text" class="search-input" id="exaSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
@@ -784,7 +810,7 @@ tbody tr:last-child td{border-bottom:none;}
       </section>
 
       <!-- ============ CONFERÊNCIA DE RESULTADOS ============ -->
-      <section class="view" id="view-conferencia">
+      <section class="view list-view" id="view-conferencia">
         <div id="confStatsRow" class="mini-chart-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;"></div>
         <p class="helper-text">Se reprovado, escolha o motivo e o aluno vai para "Reprovado no psico/médico". Se aprovado, segue para Cobrança.</p>
         <div class="toolbar"><input type="text" class="search-input" id="confSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
@@ -797,7 +823,7 @@ tbody tr:last-child td{border-bottom:none;}
       </section>
 
       <!-- ============ REPROVADO NO PSICO/MÉDICO ============ -->
-      <section class="view" id="view-alunos-reprovados">
+      <section class="view list-view" id="view-alunos-reprovados">
         <div id="reprStatsRow" class="mini-chart-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;"></div>
         <p class="helper-text">Quando concluir a repescagem, o aluno volta para a Conferência de Resultados para nova avaliação.</p>
         <div class="toolbar"><input type="text" class="search-input" id="reprSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
@@ -810,7 +836,7 @@ tbody tr:last-child td{border-bottom:none;}
       </section>
 
       <!-- ============ COBRANÇA ============ -->
-      <section class="view" id="view-cobranca">
+      <section class="view list-view" id="view-cobranca">
         <div id="cobStatsRow" class="mini-chart-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;"></div>
         <p class="helper-text">Ao marcar como pago, o aluno segue para o Curso Teórico.</p>
         <div class="toolbar"><input type="text" class="search-input" id="cobSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
@@ -823,7 +849,7 @@ tbody tr:last-child td{border-bottom:none;}
       </section>
 
       <!-- ============ CURSO TEÓRICO ============ -->
-      <section class="view" id="view-aulas">
+      <section class="view list-view" id="view-aulas">
         <div id="aulStatsRow" class="mini-chart-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;"></div>
         <p class="helper-text">Ao agendar (data + turma), o aluno passa para "Curso Teórico Concluído".</p>
         <div class="toolbar"><input type="text" class="search-input" id="aulSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
@@ -836,7 +862,7 @@ tbody tr:last-child td{border-bottom:none;}
       </section>
 
       <!-- ============ CURSO TEÓRICO CONCLUÍDO ============ -->
-      <section class="view" id="view-agendados">
+      <section class="view list-view" id="view-agendados">
         <div id="agdStatsRow" class="mini-chart-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;"></div>
         <p class="helper-text">Se reprovado aqui, o aluno volta para o Curso Teórico para reagendar. Se aprovado, segue para a Cobrança.</p>
         <div class="toolbar">
@@ -855,7 +881,7 @@ tbody tr:last-child td{border-bottom:none;}
       </section>
 
       <!-- ============ COBRANÇA (CURSO) ============ -->
-      <section class="view" id="view-cobranca-curso">
+      <section class="view list-view" id="view-cobranca-curso">
         <div id="cobCursoStatsRow" class="mini-chart-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;"></div>
         <p class="helper-text">Ao marcar como pago, o aluno segue para o Agendamento de Prova Escrita.</p>
         <div class="toolbar"><input type="text" class="search-input" id="cobCursoSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
@@ -868,7 +894,7 @@ tbody tr:last-child td{border-bottom:none;}
       </section>
 
       <!-- ============ AGENDAMENTO DE PROVA ESCRITA ============ -->
-      <section class="view" id="view-prova-escrita-agendamento">
+      <section class="view list-view" id="view-prova-escrita-agendamento">
         <div id="provaAgStatsRow" class="mini-chart-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;"></div>
         <p class="helper-text">Ao agendar (data + hora), o aluno passa para Aguardando Resultado da Prova Escrita.</p>
         <div class="toolbar"><input type="text" class="search-input" id="provaAgSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
@@ -881,7 +907,7 @@ tbody tr:last-child td{border-bottom:none;}
       </section>
 
       <!-- ============ AGUARDANDO RESULTADO DA PROVA ESCRITA ============ -->
-      <section class="view" id="view-prova-escrita-aguardando">
+      <section class="view list-view" id="view-prova-escrita-aguardando">
         <div id="provaAgdStatsRow" class="mini-chart-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;"></div>
         <p class="helper-text">Se reprovado, o aluno vai para "Reprovado na Prova Escrita" para reprogramar. Se aprovado, segue para a Conferência de Cobrança.</p>
         <div class="toolbar"><input type="text" class="search-input" id="provaAgdSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
@@ -894,7 +920,7 @@ tbody tr:last-child td{border-bottom:none;}
       </section>
 
       <!-- ============ REPROVADO NA PROVA ESCRITA ============ -->
-      <section class="view" id="view-prova-escrita-reprovado">
+      <section class="view list-view" id="view-prova-escrita-reprovado">
         <div id="provaReprStatsRow" class="mini-chart-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;"></div>
         <p class="helper-text">Ao reprogramar, o aluno volta para "Aguardando Resultado da Prova Escrita".</p>
         <div class="toolbar"><input type="text" class="search-input" id="provaReprSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
@@ -907,7 +933,7 @@ tbody tr:last-child td{border-bottom:none;}
       </section>
 
       <!-- ============ CONFERÊNCIA DE COBRANÇA ============ -->
-      <section class="view" id="view-conferencia-cobranca">
+      <section class="view list-view" id="view-conferencia-cobranca">
         <div id="confCobStatsRow" class="mini-chart-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;"></div>
         <p class="helper-text">Confira o pagamento do curso antes de liberar o Agendamento de Aulas Práticas.</p>
         <div class="toolbar"><input type="text" class="search-input" id="confCobSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
@@ -920,7 +946,7 @@ tbody tr:last-child td{border-bottom:none;}
       </section>
 
       <!-- ============ AGENDAMENTO DE AULAS PRÁTICAS ============ -->
-      <section class="view" id="view-teste-pratico">
+      <section class="view list-view" id="view-teste-pratico">
         <div id="tstStatsRow" class="mini-chart-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;"></div>
         <p class="helper-text">Ao agendar (data + hora), o aluno passa para o Agendamento de Teste de Volante.</p>
         <div class="toolbar"><input type="text" class="search-input" id="tstSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
@@ -933,7 +959,7 @@ tbody tr:last-child td{border-bottom:none;}
       </section>
 
       <!-- ============ AGENDAMENTO DE TESTE DE VOLANTE ============ -->
-      <section class="view" id="view-resultado-teste">
+      <section class="view list-view" id="view-resultado-teste">
         <div id="resStatsRow" class="mini-chart-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;"></div>
         <p class="helper-text">Ao agendar (data + hora), o aluno passa para o Resultado do Teste de Volante.</p>
         <div class="toolbar">
@@ -951,7 +977,7 @@ tbody tr:last-child td{border-bottom:none;}
       </section>
 
       <!-- ============ RESULTADO TESTE DE VOLANTE ============ -->
-      <section class="view" id="view-teste-volante-resultado">
+      <section class="view list-view" id="view-teste-volante-resultado">
         <div id="volResStatsRow" class="mini-chart-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;"></div>
         <p class="helper-text">Se reprovado, o aluno volta para o Agendamento de Teste de Volante. Se aprovado, segue para Alunos Aprovados.</p>
         <div class="toolbar"><input type="text" class="search-input" id="volResSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
@@ -964,7 +990,7 @@ tbody tr:last-child td{border-bottom:none;}
       </section>
 
       <!-- ============ ALUNOS APROVADOS (final) ============ -->
-      <section class="view" id="view-clientes-aprovados">
+      <section class="view list-view" id="view-clientes-aprovados">
         <div id="finStatsRow" class="mini-chart-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;"></div>
         <div class="toolbar"><input type="text" class="search-input" id="finSearch" placeholder="Buscar por cliente..." /><div class="spacer"></div></div>
         <div class="table-wrap">
@@ -976,53 +1002,53 @@ tbody tr:last-child td{border-bottom:none;}
       </section>
 
       <!-- ============ INDICADOR: CONTATO POR ORIGEM ============ -->
-      <section class="view" id="view-ind-contato">
+      <section class="view list-view" id="view-ind-contato">
         <div class="toolbar" id="indContatoToolbar"></div>
         <div class="legend-row"><span class="legend-swatch"></span> Fim de semana</div>
         <div class="table-wrap"><table><thead id="indContatoHead"></thead><tbody id="indContatoBody"></tbody></table></div>
       </section>
 
       <!-- ============ INDICADOR: PROPOSTAS ENVIADAS ============ -->
-      <section class="view" id="view-ind-propostas">
+      <section class="view list-view" id="view-ind-propostas">
         <div class="toolbar" id="indPropostasToolbar"></div>
         <div class="legend-row"><span class="legend-swatch"></span> Fim de semana</div>
         <div class="table-wrap"><table><thead id="indPropostasHead"></thead><tbody id="indPropostasBody"></tbody></table></div>
       </section>
 
       <!-- ============ INDICADOR: CONTATOS REALIZADOS ============ -->
-      <section class="view" id="view-ind-contatos-realizados">
+      <section class="view list-view" id="view-ind-contatos-realizados">
         <div class="toolbar" id="indContatosRealizadosToolbar"></div>
         <div class="legend-row"><span class="legend-swatch"></span> Fim de semana</div>
         <div class="table-wrap"><table><thead id="indContatosRealizadosHead"></thead><tbody id="indContatosRealizadosBody"></tbody></table></div>
       </section>
 
       <!-- ============ INDICADOR: APROVADOS ============ -->
-      <section class="view" id="view-ind-aprovados">
+      <section class="view list-view" id="view-ind-aprovados">
         <div class="toolbar" id="indAprovadosToolbar"></div>
         <div class="legend-row"><span class="legend-swatch"></span> Fim de semana</div>
         <div class="table-wrap"><table><thead id="indAprovadosHead"></thead><tbody id="indAprovadosBody"></tbody></table></div>
       </section>
 
       <!-- ============ CADASTRO: VENDEDORES ============ -->
-      <section class="view" id="view-cad-vendedores">
+      <section class="view list-view" id="view-cad-vendedores">
         <div class="toolbar"><div class="spacer"></div><button class="btn btn-yellow" id="btnNovoVendedor">+ Novo Vendedor</button></div>
         <div class="table-wrap"><table><thead><tr><th>Nome</th><th>Status</th><th>Ações</th></tr></thead><tbody id="vendedoresTableBody"></tbody></table></div>
       </section>
 
       <!-- ============ CADASTRO: ORIGENS ============ -->
-      <section class="view" id="view-cad-origens">
+      <section class="view list-view" id="view-cad-origens">
         <div class="toolbar"><div class="spacer"></div><button class="btn btn-yellow" id="btnNovaOrigem">+ Nova Origem</button></div>
         <div class="table-wrap"><table><thead><tr><th>Nome</th><th>Status</th><th>Ações</th></tr></thead><tbody id="origensTableBody"></tbody></table></div>
       </section>
 
       <!-- ============ CADASTRO: MOTIVOS ============ -->
-      <section class="view" id="view-cad-motivos">
+      <section class="view list-view" id="view-cad-motivos">
         <div class="toolbar"><div class="spacer"></div><button class="btn btn-yellow" id="btnNovoMotivo">+ Novo Motivo</button></div>
         <div class="table-wrap"><table><thead><tr><th>Nome</th><th>Status</th><th>Ações</th></tr></thead><tbody id="motivosTableBody"></tbody></table></div>
       </section>
 
       <!-- ============ CADASTRO: METAS ============ -->
-      <section class="view" id="view-cad-metas">
+      <section class="view list-view" id="view-cad-metas">
         <div class="toolbar" id="metasToolbar"></div>
         <p class="helper-text">Defina a meta de quantidade e/ou valor para cada dia do mês selecionado. Use "Distribuir total" para preencher automaticamente os dias úteis a partir de uma meta mensal.</p>
         <div class="table-wrap"><table><thead><tr><th>Dia</th><th>Dia da Semana</th><th>Meta Qtd.</th><th>Meta Valor (R$)</th></tr></thead><tbody id="metasTableBody"></tbody></table></div>
@@ -1030,7 +1056,7 @@ tbody tr:last-child td{border-bottom:none;}
       </section>
 
       <!-- ============ CADASTRO: USUÁRIOS E PERMISSÕES ============ -->
-      <section class="view" id="view-cad-usuarios">
+      <section class="view list-view" id="view-cad-usuarios">
         <p class="helper-text">Crie logins adicionais para outras pessoas acessarem o sistema, escolhendo quais telas cada um pode ver. O login "admin" é fixo e sempre tem acesso total.</p>
         <div class="toolbar"><div class="spacer"></div><button class="btn btn-yellow" id="btnNovoUsuario">+ Novo Usuário</button></div>
         <div class="table-wrap">
@@ -2062,20 +2088,22 @@ const BAR_VALUE_LABELS_PLUGIN = {
     chart.data.datasets.forEach((dataset, dsIndex)=>{
       const meta = chart.getDatasetMeta(dsIndex);
       if(meta.hidden) return;
+      const formatter = dataset.valueFormatter || (v=>String(v));
       meta.data.forEach((bar, i)=>{
         const value = dataset.data[i];
         if(value === null || value === undefined) return;
+        const label = formatter(value);
         ctx.save();
         ctx.fillStyle = '#1f2937';
         ctx.font = '700 13px Inter, sans-serif';
         if(chart.options.indexAxis === 'y'){
           ctx.textAlign = 'left';
           ctx.textBaseline = 'middle';
-          ctx.fillText(String(value), bar.x + 8, bar.y);
+          ctx.fillText(label, bar.x + 8, bar.y);
         } else {
           ctx.textAlign = 'center';
           ctx.textBaseline = 'bottom';
-          ctx.fillText(String(value), bar.x, bar.y - 8);
+          ctx.fillText(label, bar.x, bar.y - 8);
         }
         ctx.restore();
       });
@@ -2166,7 +2194,7 @@ async function renderDashboard(){
   destroyChart('valor');
   state.charts.valor = new Chart(document.getElementById('chartValor'), {
     type: 'bar',
-    data: { labels: ['Leads', 'Aprovados'], datasets: [{ data: [totalValor, aprovValor], backgroundColor: verticalBarGradientMulti(['#1477a8','#f5c518']), borderRadius:5 }] },
+    data: { labels: ['Leads', 'Aprovados'], datasets: [{ data: [totalValor, aprovValor], backgroundColor: verticalBarGradientMulti(['#1477a8','#f5c518']), borderRadius:5, valueFormatter: fmtMoney }] },
     options: { responsive:true, maintainAspectRatio:false, layout:{padding:{top:20}}, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, suggestedMax: Math.max(totalValor,aprovValor,1)*1.25, ticks:{ callback:(v)=>fmtMoney(v), font:{size:11} } }, x:{ ticks:{ font:{size:12} } } } },
     plugins: [BAR_VALUE_LABELS_PLUGIN]
   });
@@ -2174,13 +2202,28 @@ async function renderDashboard(){
   if(miniValorTitle) miniValorTitle.textContent = `Valor: Orç. x Aprov. (${pctValor.toFixed(0)}%)`;
 
   const origensAtivas = state.origens.filter(o=>o.ativo);
-  const origemCounts = origensAtivas.map(o => (orcamentosMes||[]).filter(r=>r.origem_id===o.id).length);
+  const origemData = origensAtivas
+    .map(o => ({ nome: o.nome, count: (orcamentosMes||[]).filter(r=>r.origem_id===o.id).length }))
+    .sort((a,b)=> b.count - a.count);
   destroyChart('origem');
+  const origemBg = horizontalBarGradientByIndex(i => CHART_PALETTE[i % CHART_PALETTE.length]);
   state.charts.origem = new Chart(document.getElementById('chartOrigem'), {
-    type: 'doughnut',
-    data: { labels: origensAtivas.map(o=>o.nome), datasets: [{ data: origemCounts, backgroundColor: pieSliceGradients(CHART_PALETTE), borderColor:'#fff', borderWidth:1.5 }] },
-    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ boxWidth:8, font:{size:9.5}, padding:6 } } } }
+    type: 'bar',
+    data: { labels: origemData.map(o=>o.nome), datasets: [{ data: origemData.map(o=>o.count), backgroundColor: origemBg, borderRadius:4 }] },
+    options: {
+      indexAxis: 'y',
+      responsive:true, maintainAspectRatio:false,
+      layout:{ padding:{ right:40 } },
+      plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:(c)=> c.parsed.x + ' lead' + (c.parsed.x===1?'':'s') } } },
+      scales:{ x:{ beginAtZero:true, suggestedMax: Math.max(...origemData.map(o=>o.count),1)*1.2, ticks:{ precision:0, font:{size:11} } }, y:{ ticks:{ font:{size:12} } } }
+    },
+    plugins: [BAR_VALUE_LABELS_PLUGIN]
   });
+  const funilOrigemTitle = document.getElementById('funilOrigemTitle');
+  if(funilOrigemTitle){
+    const totalOrigem = origemData.reduce((s,o)=> s + o.count, 0);
+    funilOrigemTitle.textContent = `Funil de Origem dos Leads (${totalOrigem} no período)`;
+  }
 
   const monthlyApproved = Array.from({length:12}, (_,i)=>{
     const mm = String(i+1).padStart(2,'0');
